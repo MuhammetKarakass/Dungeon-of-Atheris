@@ -3,10 +3,26 @@
 
 #include "Characters/EnemyCharacter.h"
 
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "AbilitySystem/BaseAttributeSet.h"
+
 AEnemyCharacter::AEnemyCharacter()
 {
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility,ECR_Block);
 
+	AbilitySystemComponent=CreateDefaultSubobject<UBaseAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->ReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	AttributeSet=CreateDefaultSubobject<UBaseAttributeSet>("AttributeSet");
+
+}
+
+void AEnemyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 }
 
 void AEnemyCharacter::HiglightActor()
@@ -22,3 +38,5 @@ void AEnemyCharacter::UnHiglightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
 }
+
+

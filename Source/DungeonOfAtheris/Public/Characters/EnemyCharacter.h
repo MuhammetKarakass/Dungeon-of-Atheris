@@ -19,6 +19,11 @@ public:
 
 	AEnemyCharacter();
 
+	// begin Enemy Interface
 	virtual void HiglightActor() override;
 	virtual void UnHiglightActor() override;
+	// end Enemy Interface
+
+protected:
+	virtual void BeginPlay() override;
 };

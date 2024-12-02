@@ -24,8 +24,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_Controller() override;
 
+private:
 
-	
-	
+	void InıtAbilityActorInfo();
 };
