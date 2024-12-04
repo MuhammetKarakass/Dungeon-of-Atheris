@@ -13,10 +13,10 @@ UCLASS()
 class DUNGEONOFATHERIS_API AAuraCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
+	
+public:
 
 	AAuraCharacter();
-
-public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
@@ -25,9 +25,12 @@ public:
 	TObjectPtr<UCameraComponent> CameraComp;
 
 	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_Controller() override;
+	virtual void OnRep_PlayerState() override;
 
+	void InitAbilityActorInfo();
+
+	
 private:
 
-	void InıtAbilityActorInfo();
+	
 };

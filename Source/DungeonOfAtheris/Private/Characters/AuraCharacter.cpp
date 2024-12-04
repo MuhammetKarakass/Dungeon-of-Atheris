@@ -39,23 +39,33 @@ AAuraCharacter::AAuraCharacter()
 
 void AAuraCharacter::PossessedBy(AController* NewController)
 {
-	//init ability actor info for server
 	Super::PossessedBy(NewController);
-	InıtAbilityActorInfo();
+	InitAbilityActorInfo();
 }
 
-void AAuraCharacter::OnRep_Controller()
+void AAuraCharacter::OnRep_PlayerState()
 {
-	//init ability actor for client
-	Super::OnRep_Controller();
-	InıtAbilityActorInfo();
+	Super::OnRep_PlayerState();
+	InitAbilityActorInfo();
 }
 
-void AAuraCharacter::InıtAbilityActorInfo()
+
+void AAuraCharacter::InitAbilityActorInfo()
 {
-	AAuraPlayerState* PlayerState=GetPlayerState<AAuraPlayerState>();
-	check(PlayerState);
-	PlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(PlayerState,this);
-	AbilitySystemComponent=PlayerState->GetAbilitySystemComponent();
-	AttributeSet=PlayerState->GetAttributeSet();
+	{
+		AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+		if (!AuraPlayerState)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AuraPlayerState is NULL!"));
+			return;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AuraPlayerState is already in use!"));
+		}
+		check(AuraPlayerState);
+		AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
+		AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
+		AttributeSet = AuraPlayerState->GetAttributeSet();
+	}
 }
