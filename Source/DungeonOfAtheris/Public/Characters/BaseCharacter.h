@@ -10,7 +10,7 @@
 class UAbilitySystemComponent;
 class UAttributeSet;
 
-UCLASS(Abstract)
+UCLASS(Abstract) //Abstract means can't instanciate in the game
 class DUNGEONOFATHERIS_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
@@ -18,7 +18,7 @@ class DUNGEONOFATHERIS_API ABaseCharacter : public ACharacter, public IAbilitySy
 public:
 
 	ABaseCharacter();
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; //AbilitySystemInterface function for get ability system component
 	UAttributeSet* GetAttributeSet() const {return AttributeSet;}
 
 protected:

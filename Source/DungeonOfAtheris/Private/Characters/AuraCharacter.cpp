@@ -7,7 +7,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
+#include "UI/HUD/BaseHUD.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -18,7 +20,6 @@ AAuraCharacter::AAuraCharacter()
 
 	CameraComp=CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp,USpringArmComponent::SocketName);
-
 	
 	SpringArmComp->bUsePawnControlRotation=false;
 	SpringArmComp->bEnableCameraLag=true;
@@ -67,5 +68,12 @@ void AAuraCharacter::InitAbilityActorInfo()
 		AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 		AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 		AttributeSet = AuraPlayerState->GetAttributeSet();
+		if (AAuraPlayerController* AuraController=Cast<AAuraPlayerController>(GetController()))
+		{
+			if (ABaseHUD* BaseHUD=Cast<ABaseHUD>(AuraController->GetHUD()))
+			{
+				BaseHUD->InıtOverlay(AuraController,AuraPlayerState,AbilitySystemComponent,AttributeSet);
+			}
+		}
 	}
 }
