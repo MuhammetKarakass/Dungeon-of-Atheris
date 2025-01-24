@@ -3,16 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UI/WidgetController/BaseWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+class UBaseUserWidget;
+struct FGameplayTag;
 struct FOnAttributeChangeData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
+USTRUCT(BlueprintType)
+struct FUIWidgetRow:public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FGameplayTag GameplayTag=FGameplayTag();
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FText Message=FText();
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TSubclassOf<UBaseUserWidget> MessageWidget;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UTexture2D> Image=nullptr;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, NewHealth,float,OldHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
 /**
  * 
  */
@@ -35,9 +56,23 @@ public:
 	UPROPERTY(BlueprintAssignable,Category="GAS|Attributes")
 	FOnMaxManaChangedSignature OnMaxManaChanged;
 
+	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
+	FMessageWidgetRowSignature MessageWidgetRowDelegate;
+
 protected:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UDataTable> MessageWidgetDataTable;
 	void HealthChange(const FOnAttributeChangeData& Data) const;
 	void MaxHealthChange(const FOnAttributeChangeData& Data) const;
 	void ManaChange(const FOnAttributeChangeData& Data) const;
 	void MaxManaChange(const FOnAttributeChangeData& Data) const;
+
+	template<typename T>
+	T* GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag);
 };
+
+template <typename T>
+T* UOverlayWidgetController::GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(),TEXT(""));
+}

@@ -41,7 +41,7 @@ struct FEffectProperties
 	ACharacter* TargetCharacter = nullptr;
 };
 
-UCLASS()
+UCLASS(Blueprintable,BlueprintType)
 class DUNGEONOFATHERIS_API UBaseAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
@@ -56,20 +56,20 @@ public:
 	
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	
-	UPROPERTY(BlueprintReadOnly,ReplicatedUsing = OnRep_Health,Category="Vital Attributes")
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_Health,Category="Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,Health);
 
-	UPROPERTY(BlueprintReadOnly,ReplicatedUsing = OnRep_MaxHealth,Category="Vital Attributes")
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_MaxHealth,Category="Vital Attributes")
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,MaxHealth);
 
 
-	UPROPERTY(BlueprintReadOnly,ReplicatedUsing = OnRep_Mana,Category="Vital Attributes")
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_Mana,Category="Vital Attributes")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,Mana);
 	
-    UPROPERTY(BlueprintReadOnly,ReplicatedUsing = OnRep_MaxMana,Category="Vital Attributes")
+    UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_MaxMana,Category="Vital Attributes")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,MaxMana);
 	
@@ -84,7 +84,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
-	
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthFloat()  const {return GetHealth();};
 
 protected:
 

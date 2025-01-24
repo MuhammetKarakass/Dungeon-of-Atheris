@@ -48,7 +48,6 @@ void AAuraPlayerController::CursorTrace()
 			//do nothing
 		}
 	}
-
 	else
 	{
 		if (CurrentActor==nullptr)
@@ -68,7 +67,6 @@ void AAuraPlayerController::CursorTrace()
 			}
 		}
 	}
-	
 }
 
 void AAuraPlayerController::BeginPlay()
