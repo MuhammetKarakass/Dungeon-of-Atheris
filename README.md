@@ -6,7 +6,7 @@
 
 **Proje Kategorisi:** Bilgisayar oyunu
 
-**Grup Adı:** Belirlediğiniz grup adı
+**Grup Adı:** Atheris
 
 **Proje Ekibi:** Muhammet Ali Karakaş
 
