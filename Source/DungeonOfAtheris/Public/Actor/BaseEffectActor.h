@@ -39,6 +39,10 @@ struct FGameplayEffectStruct
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
     EEffectRemovalPolicy EffectRemovalPolicy=EEffectRemovalPolicy::RemoveOnEndOverlap;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
+	float EffectLevel=1.f;
+
 };
 
 UCLASS()
@@ -64,31 +68,29 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ApplyEffectToTarget(AActor* ActorTarget,const FGameplayEffectStruct& GameplayEffectStruct);
 
+	//2 veriyi tutuyoruz
+	TMap<FActiveGameplayEffectHandle,UAbilitySystemComponent*> ActiveGameplayEffects;
+
+
+	
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// TArray<TSubclassOf<UGameplayEffect>> InstantGameplayEffect;
- //
+	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
- //    EEffectApplicationPolicy InstantEffectApplicationPolicy=EEffectApplicationPolicy::DoNotApply;
+	//    EEffectApplicationPolicy InstantEffectApplicationPolicy=EEffectApplicationPolicy::DoNotApply;
 	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// TArray<TSubclassOf<UGameplayEffect>> DurationGameplayEffect;
- //
+	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// EEffectApplicationPolicy DurationEffectApplicationPolicy=EEffectApplicationPolicy::DoNotApply;
 	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// TArray<TSubclassOf<UGameplayEffect>> InfiniteGameplayEffect;
- //
+	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// EEffectApplicationPolicy InfiniteEffectApplicationPolicy=EEffectApplicationPolicy::DoNotApply;    
 	//
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// EEffectRemovalPolicy InfiniteEffectRemovalPolicy=EEffectRemovalPolicy::RemoveOnEndOverlap;
-
-	//2 veriyi tutuyoruz
-	TMap<FActiveGameplayEffectHandle,UAbilitySystemComponent*> ActiveGameplayEffects;
-
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
-	float EffectLevel=1.f;
-
 };

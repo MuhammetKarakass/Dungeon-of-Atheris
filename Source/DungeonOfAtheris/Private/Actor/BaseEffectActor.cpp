@@ -6,8 +6,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
-#include "AbilitySystemInterface.h"
-
 // Sets default values
 ABaseEffectActor::ABaseEffectActor()
 {
@@ -30,6 +28,12 @@ void ABaseEffectActor::OnOverlap(AActor* TargetActor)
 			ApplyEffectToTarget(TargetActor, EffectStruct);
 		}
 	}
+	// if (IAbilitySystemInterface* ACSInterface=Cast<IAbilitySystemInterface>(TargetActor))
+	// {
+	// 	const UBaseAttributeSet* Attributeset=Cast<UBaseAttributeSet>(ACSInterface->GetAbilitySystemComponent()->GetAttributeSet(UAttributeSet::StaticClass()));
+	// 	UBaseAttributeSet* Mutable=const_cast<UBaseAttributeSet*>(Attributeset);
+	// 	Mutable->SetHealth(Mutable->GetHealth()+100.0f);
+	// }
 }
 
 void ABaseEffectActor::OnEndOverlap(AActor* TargetActor)
@@ -72,7 +76,7 @@ void ABaseEffectActor::ApplyEffectToTarget(AActor* ActorTarget,const FGameplayEf
 		//Efektin kaynağını belirtmek.
 		EffectContextHandle.AddSourceObject(this);
 		//Efektin işlevselliğini tanımlar (örneğin, ne kadar hasar vereceği veya hangi özellikleri değiştireceği gibi).
-		const FGameplayEffectSpecHandle EffectSpecHandle=TargetASC->MakeOutgoingSpec(GameplayEffectStruct.GameplayEffectClass,EffectLevel,EffectContextHandle);
+		const FGameplayEffectSpecHandle EffectSpecHandle=TargetASC->MakeOutgoingSpec(GameplayEffectStruct.GameplayEffectClass,GameplayEffectStruct.EffectLevel,EffectContextHandle);
 		//Tanımlanan efekt hedefe uygulanır.
 		const FActiveGameplayEffectHandle ActiveEffectHandle=TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 

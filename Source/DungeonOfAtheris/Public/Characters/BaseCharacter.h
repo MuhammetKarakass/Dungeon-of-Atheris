@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
 
-UCLASS(Abstract) //Abstract means can't instanciate in the game
-class DUNGEONOFATHERIS_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
+UCLASS(Abstract) //Abstract means can't instance in the game
+class DUNGEONOFATHERIS_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -26,7 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void InitAbilityActorInfo();
-
+	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
@@ -35,5 +36,16 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
-	
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere,category="Attributes")
+	TSubclassOf<class UGameplayEffect> DefaultPrimaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<class UGameplayEffect> DefaultSecondaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category = "Attributes")
+	TSubclassOf<class UGameplayEffect> DefaultVitalAttributes;
+
+	void ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const;
+	void InitDefaultAttributes() const;
 };

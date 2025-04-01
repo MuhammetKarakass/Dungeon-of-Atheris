@@ -75,7 +75,7 @@ void AAuraPlayerController::BeginPlay()
 	check(AuraContext);
 	
 	UEnhancedInputLocalPlayerSubsystem *Subsystem=ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-
+	
 	if (Subsystem)
 	{Subsystem->AddMappingContext(AuraContext,0);}
 

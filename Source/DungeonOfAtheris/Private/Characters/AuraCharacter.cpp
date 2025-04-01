@@ -74,8 +74,17 @@ void AAuraCharacter::InitAbilityActorInfo()
 		{
 			if (ABaseHUD* BaseHUD=Cast<ABaseHUD>(AuraController->GetHUD()))
 			{
-				BaseHUD->InıtOverlay(AuraController,AuraPlayerState,AbilitySystemComponent,AttributeSet);
+				BaseHUD->InitOverlay(AuraController,AuraPlayerState,AbilitySystemComponent,AttributeSet);
 			}
 		}
+		InitDefaultAttributes();
 	}
+}
+
+int32 AAuraCharacter::GetPlayerLevel()
+{
+	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+
+	return AuraPlayerState->GetPlayerLevel();
 }

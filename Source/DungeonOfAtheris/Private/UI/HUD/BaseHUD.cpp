@@ -18,7 +18,7 @@ UOverlayWidgetController* ABaseHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
-void ABaseHUD::InıtOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
+void ABaseHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
 	checkf(OverlayWidgetClass,TEXT("Overlay Widget class is null"));
 	checkf(OverlayWidgetControllerClass,TEXT("Overlay Widget Controller class is null"));
