@@ -16,3 +16,7 @@
 4. [Front-End](Front-End.md)
 5. [Back-End](Back-End.md)
 6. [Video Sunum](Sunum.md)
+
+**Yapılan Çalışmalara Ait Videolar:** 
+https://youtu.be/fReGhemKiwk
+https://youtu.be/8padn3SDU9k

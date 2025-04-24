@@ -13,6 +13,15 @@ void UBaseAbilitySystemComponent::AbilityActorInfoSet()
 	GEngine->AddOnScreenDebugMessage(-1,10.f,FColor::Red,FString::Printf(TEXT("%s"),*GameplayTags.Attribute_Secondary_Armor.ToString()));
 }
 
+void UBaseAbilitySystemComponent::AddCharacterAbilites(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilites)
+{
+	for (TSubclassOf<UGameplayAbility> AbilityClass:StartupAbilites)
+	{
+		FGameplayAbilitySpec AbilitySpec=FGameplayAbilitySpec(AbilityClass,1);
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UBaseAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
                                                 const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle)
 {

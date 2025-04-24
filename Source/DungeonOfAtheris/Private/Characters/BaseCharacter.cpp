@@ -4,6 +4,7 @@
 #include "Characters/BaseCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -48,4 +49,14 @@ void ABaseCharacter::InitDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributes,1.0f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes,1.0f);
 	ApplyEffectToSelf(DefaultVitalAttributes,1.0f);
+}
+
+void ABaseCharacter::AddCharacterAbilities()
+{
+	if (!HasAuthority()) return;
+	if (UBaseAbilitySystemComponent* ABC=Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		ABC->AddCharacterAbilites(Abilities);
+	}
+	
 }

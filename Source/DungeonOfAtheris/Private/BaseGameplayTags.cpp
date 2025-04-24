@@ -9,6 +9,7 @@ FBaseGameplayTags FBaseGameplayTags::GameplayTags;
 void FBaseGameplayTags::InitializeNativeGameplayTags()
 {
 
+	//Primary Attributes Tags
 	GameplayTags.Attribute_Primary_Strength=UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Primary.Strength"),
 		FString("Increases physical damage"));
@@ -24,7 +25,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attribute_Primary_Vigor=UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Primary.Vigor"),
 		FString("Increases Health"));
-	
+
+
+	//Secondary Attributes Tags
 	GameplayTags.Attribute_Secondary_Armor=UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Attributes.Secondary.Armor"),
 	FString("Reduces damage taken, improves Block Chance"));
@@ -65,5 +68,28 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 		FName("Attributes.Secondary.MaxMana"),
 		FString("Maximum amount of Mana"));
 	
-	
+	//Input Tags
+	GameplayTags.InputTag_LMB=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.LMB"),
+		FString("Input tag for Left Mouse Button"));
+
+	GameplayTags.InputTag_RMB=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.RMB"),
+		FString("Input tag for Right Mouse Button"));
+
+	GameplayTags.InputTag_1=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.1"),
+		FString("Input tag for 1 Key"));
+
+	GameplayTags.InputTag_2=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.2"),
+		FString("Input tag for 2 Key"));
+
+	GameplayTags.InputTag_3=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.3"),
+		FString("Input tag for 3 Key"));
+
+	GameplayTags.InputTag_4=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.4"),
+		FString("Input tag for 4 key"));
 }
