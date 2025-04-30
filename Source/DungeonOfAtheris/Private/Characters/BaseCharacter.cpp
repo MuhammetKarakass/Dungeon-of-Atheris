@@ -32,6 +32,12 @@ void ABaseCharacter::InitAbilityActorInfo()
 {
 }
 
+FVector ABaseCharacter::GetSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
 
 void ABaseCharacter::ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const
 {
@@ -56,7 +62,7 @@ void ABaseCharacter::AddCharacterAbilities()
 	if (!HasAuthority()) return;
 	if (UBaseAbilitySystemComponent* ABC=Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
 	{
-		ABC->AddCharacterAbilites(Abilities);
+		ABC->AddCharacterAbilities(Abilities);
 	}
 	
 }

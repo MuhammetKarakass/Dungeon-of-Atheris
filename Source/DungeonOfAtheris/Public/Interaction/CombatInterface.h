@@ -24,4 +24,5 @@ class DUNGEONOFATHERIS_API ICombatInterface
 public:
 
 	virtual int32 GetPlayerLevel();
+	virtual FVector GetSocketLocation();
 };

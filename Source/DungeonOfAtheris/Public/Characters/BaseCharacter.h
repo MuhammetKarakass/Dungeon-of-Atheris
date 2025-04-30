@@ -28,10 +28,14 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void InitAbilityActorInfo();
+	virtual FVector GetSocketLocation();
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
+	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 

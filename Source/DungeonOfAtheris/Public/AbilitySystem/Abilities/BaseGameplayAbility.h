@@ -13,5 +13,8 @@ UCLASS()
 class DUNGEONOFATHERIS_API UBaseGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(EditAnywhere,Category="Input")
+	FGameplayTag StartupInputTag;
 };

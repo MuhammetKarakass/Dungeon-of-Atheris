@@ -19,10 +19,13 @@ class DUNGEONOFATHERIS_API UBaseAbilitySystemComponent : public UAbilitySystemCo
 
 public:
 	void AbilityActorInfoSet();
-	void AddCharacterAbilites(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilites);
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
 	FEffectAssetTags EffectAssetTags;
 protected:
-	
+
+	UFUNCTION(Client,Reliable)
 	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
 };
