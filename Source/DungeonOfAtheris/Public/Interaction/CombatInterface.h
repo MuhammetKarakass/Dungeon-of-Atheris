@@ -7,7 +7,7 @@
 #include "CombatInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI,Blueprintable)
 class UCombatInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -25,4 +25,7 @@ public:
 
 	virtual int32 GetPlayerLevel();
 	virtual FVector GetSocketLocation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateFacingTarget(const FVector& Target);
 };

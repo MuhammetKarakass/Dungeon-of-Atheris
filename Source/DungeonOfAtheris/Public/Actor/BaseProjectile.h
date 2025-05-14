@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "BaseProjectile.generated.h"
 
 class UProjectileMovementComponent;
 class USphereComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class DUNGEONOFATHERIS_API ABaseProjectile : public AActor
@@ -19,9 +21,12 @@ public:
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 	ABaseProjectile();
 
+	UPROPERTY(BlueprintReadWrite,meta=(ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageSpecHandle;
 protected:
 
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -29,5 +34,19 @@ private:
 	UPROPERTY(VisibleAnywhere);
 	TObjectPtr<USphereComponent> Sphere;
 
-	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> ImpactEffect;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> FloatingSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LifeSpan=15.f;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoopingSound;
+	bool bHit=false;
 };

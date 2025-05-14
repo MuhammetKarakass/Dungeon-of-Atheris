@@ -5,6 +5,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "DungeonOfAtheris/DungeonOfAtheris.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -14,6 +16,10 @@ ABaseCharacter::ABaseCharacter()
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile,ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 }
 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const

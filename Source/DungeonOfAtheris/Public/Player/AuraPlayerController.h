@@ -40,6 +40,10 @@ private:
 	void AbilityInputTagPressed(FGameplayTag Tag);
 	void AbilityInputTagReleased(FGameplayTag Tag);
 	void AbilityInputTagHeld(FGameplayTag Tag);
+
+	bool bShiftKeyDown=false;
+	void ShiftKeyPressed(){bShiftKeyDown=true;}
+	void ShiftKeyReleased(){bShiftKeyDown=false;}
 	UBaseAbilitySystemComponent* GetASC();
 
 	TScriptInterface<IEnemyInterface> CurrentActor;
@@ -52,8 +56,11 @@ private:
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditAnywhere,Category = Input)
-	TObjectPtr<UAuraInputConfig>InputConfig;
+	TObjectPtr<UInputAction>ShiftAction;
 
+	UPROPERTY(EditAnywhere,Category = Input)
+	TObjectPtr<UAuraInputConfig>InputConfig;
+	
 	UPROPERTY()
 	TObjectPtr <UBaseAbilitySystemComponent> AbilitySystemComponent;
 
