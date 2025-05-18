@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "Actor/BaseProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -38,9 +39,13 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 			GetOwningActorFromActorInfo(),
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
+		
 		const UAbilitySystemComponent* ASC=UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle=ASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),ASC->MakeEffectContext());
+		
+		const float ScalableDamage=Damage.GetValueAtLevel(GetAbilityLevel());
+		FBaseGameplayTags GameplayTags=FBaseGameplayTags::Get();
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScalableDamage);
 		Projectile->DamageSpecHandle=SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}

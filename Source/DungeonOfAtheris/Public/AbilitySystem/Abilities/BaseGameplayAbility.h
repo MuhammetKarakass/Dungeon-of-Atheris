@@ -17,4 +17,7 @@ class DUNGEONOFATHERIS_API UBaseGameplayAbility : public UGameplayAbility
 public:
 	UPROPERTY(EditAnywhere,Category="Input")
 	FGameplayTag StartupInputTag;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category="Damage")
+	FScalableFloat Damage;
 };

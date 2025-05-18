@@ -28,6 +28,11 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 }
 
 
+UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

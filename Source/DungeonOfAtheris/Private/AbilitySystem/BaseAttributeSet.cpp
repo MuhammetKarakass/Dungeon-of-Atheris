@@ -9,7 +9,6 @@
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
 
-
 UBaseAttributeSet::UBaseAttributeSet()
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
@@ -118,6 +117,24 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	if (Data.EvaluatedData.Attribute==GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(),0.f,GetMaxMana()));
+	}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			const bool bFatal = NewHealth <= 0.f;
+			if (!bFatal)
+			{
+				FGameplayTagContainer Tags;
+				Tags.AddTag(FBaseGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+			}
+		}
 	}
 }
 //vital attributes
