@@ -82,7 +82,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	}
 }
 
-int32 AAuraCharacter::GetPlayerLevel()
+int32 AAuraCharacter::GetLevel()
 {
 	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);

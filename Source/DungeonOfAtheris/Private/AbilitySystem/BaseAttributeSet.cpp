@@ -8,6 +8,9 @@
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/AuraPlayerController.h"
 
 UBaseAttributeSet::UBaseAttributeSet()
 {
@@ -89,7 +92,7 @@ void UBaseAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		}
 		if (Props.SourceController)
 		{
-			ACharacter* SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
@@ -111,7 +114,7 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	if (Data.EvaluatedData.Attribute==GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(),0.f,GetMaxHealth()));
-		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Props.TargetAvatarActor->GetName(), GetHealth());
+		//UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Props.TargetAvatarActor->GetName(), GetHealth());
 	}
 
 	if (Data.EvaluatedData.Attribute==GetManaAttribute())
@@ -128,12 +131,27 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0.f;
-			if (!bFatal)
+			if (bFatal)
+			{
+				ICombatInterface* CombatInterface=Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Die();
+				}
+			}
+
+			else
 			{
 				FGameplayTagContainer Tags;
 				Tags.AddTag(FBaseGameplayTags::Get().Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
 			}
+		}
+
+		if (Props.TargetCharacter!=Props.SourceCharacter)
+		{
+			AAuraPlayerController* PlayerController=Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter,0));
+			PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter);
 		}
 	}
 }

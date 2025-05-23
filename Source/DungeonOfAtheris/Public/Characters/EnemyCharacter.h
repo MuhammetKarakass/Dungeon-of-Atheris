@@ -25,9 +25,10 @@ public:
 	// begin Enemy Interface
 	virtual void HiglightActor() override;
 	virtual void UnHiglightActor() override;
+	virtual void Die() override;
 	// end Enemy Interface
 
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetLevel() override;
 
 	void HitReactTagChanged(const FGameplayTag CallbackTag,int32 NewCount);
 	
@@ -42,6 +43,9 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
 	float BaseWalkSpeed=250.f;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
+	float LifeSpan=5.f;
 	
 protected:
 	virtual void BeginPlay() override;

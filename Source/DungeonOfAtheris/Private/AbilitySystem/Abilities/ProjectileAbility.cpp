@@ -43,7 +43,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		const UAbilitySystemComponent* ASC=UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle=ASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),ASC->MakeEffectContext());
 		
-		const float ScalableDamage=Damage.GetValueAtLevel(GetAbilityLevel());
+		const float ScalableDamage=Damage.GetValueAtLevel(15);
 		FBaseGameplayTags GameplayTags=FBaseGameplayTags::Get();
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScalableDamage);
 		Projectile->DamageSpecHandle=SpecHandle;

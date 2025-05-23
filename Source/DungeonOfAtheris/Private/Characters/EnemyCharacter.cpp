@@ -91,7 +91,13 @@ void AEnemyCharacter::UnHiglightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
-int32 AEnemyCharacter::GetPlayerLevel()
+void AEnemyCharacter::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
+int32 AEnemyCharacter::GetLevel()
 {
 	return Level;
 }

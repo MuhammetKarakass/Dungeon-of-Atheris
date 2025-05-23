@@ -24,12 +24,21 @@ public:
 	UAttributeSet* GetAttributeSet() const {return AttributeSet;}
 
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual void Die() override;
+
+	UFUNCTION(NetMulticast,Reliable)
+	virtual void MulticastHandleDeath();
 protected:
 
 	virtual void BeginPlay() override;
 
 	virtual void InitAbilityActorInfo();
 	virtual FVector GetSocketLocation();
+
+	void ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const;
+	virtual void InitDefaultAttributes() const;
+
+	void AddCharacterAbilities();
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
@@ -52,11 +61,21 @@ protected:
 	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category = "Attributes")
 	TSubclassOf<class UGameplayEffect> DefaultVitalAttributes;
 
-	void ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const;
-	virtual void InitDefaultAttributes() const;
+	//Dissolve Effects
 
-	void AddCharacterAbilities();
+	void Dissolve();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void MeshStartDissolveTimer(UMaterialInstanceDynamic* DynamicMaterialDynamic);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void WeaponStartDissolveTimer(UMaterialInstanceDynamic* DynamicMaterialDynamic);
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> MeshDissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 private:
 	UPROPERTY(EditAnywhere, Category="Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> Abilities;

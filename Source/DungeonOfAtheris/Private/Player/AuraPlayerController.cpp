@@ -12,6 +12,8 @@
 #include "Interaction/EnemyInterface.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/Character.h"
+#include "UI/UserWidget/DamageTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -25,6 +27,18 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	AutoRun();
+}
+
+void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter)&& DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter,DamageTextComponentClass);
+		DamageTextComponent->RegisterComponent();//createdefaultsubobject gibi ama dinamik olarak oluşturduk ondan
+		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
+		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageTextComponent->SetDamageText(DamageAmmount);
+	}
 }
 
 void AAuraPlayerController::AutoRun()
