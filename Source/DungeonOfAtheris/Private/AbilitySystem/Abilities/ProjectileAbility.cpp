@@ -41,11 +41,15 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		
 		const UAbilitySystemComponent* ASC=UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-		const FGameplayEffectSpecHandle SpecHandle=ASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),ASC->MakeEffectContext());
+		const FGameplayEffectContextHandle ContextHandle=ASC->MakeEffectContext();
+		const FGameplayEffectSpecHandle SpecHandle=ASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),ContextHandle);
+
+		for (auto Pair: DamageTypes)
+		{
+			const float ScaledDamage= Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,Pair.Key,ScaledDamage);
+		}
 		
-		const float ScalableDamage=Damage.GetValueAtLevel(15);
-		FBaseGameplayTags GameplayTags=FBaseGameplayTags::Get();
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScalableDamage);
 		Projectile->DamageSpecHandle=SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}

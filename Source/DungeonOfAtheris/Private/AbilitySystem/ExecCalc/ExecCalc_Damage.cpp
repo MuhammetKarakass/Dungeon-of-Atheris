@@ -69,8 +69,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	
     // Get Damage Set by Caller Magnitude
-	float Damage=EffectSpec.GetSetByCallerMagnitude(FBaseGameplayTags::Get().Damage);
-	
+
+	float Damage=0.f;
+	for (FGameplayTag GameplayTag : FBaseGameplayTags::Get().DamageTypes)
+	{
+		float DamageType=EffectSpec.GetSetByCallerMagnitude(GameplayTag);
+		Damage+=DamageType;
+	}
     float TargetBlockChance=0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BlockChanceDef,EvaluatedParams,TargetBlockChance);
 	TargetBlockChance=FMath::Max<float>(TargetBlockChance,0.f);
@@ -99,6 +104,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const bool bBlocked=FMath::RandRange(0.f,100.f)<TargetBlockChance;
 	Damage=bBlocked ? Damage/2.f : Damage;
 
+	FGameplayEffectContextHandle EffectContextHandle=EffectSpec.GetContext();
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle,bBlocked);
+
 	UCharacterClassInfo* ClassInfo=UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);
 	FRealCurve* ArmorPenetrationCurve=ClassInfo->DamageCalculationCoefficient->FindCurve(FName("ArmorPenetration"),FString());
 	float ArmorPenetrationCoefficient=ArmorPenetrationCurve->Eval(SourceCombatInterface->GetLevel());
@@ -116,8 +124,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float CriticalHitResistanceCoefficient = CriticalHitResistanceCurve->Eval(TargetCombatInterface->GetLevel());
 
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResistanceCoefficient;
-	const bool bCriticalDamage=FMath::RandRange(0.f,100.f)<EffectiveCriticalHitChance;
-	Damage=bCriticalDamage ? Damage*2.f+SourceCriticalHitDamage : Damage;
+	const bool bCriticalHit=FMath::RandRange(0.f,100.f)<EffectiveCriticalHitChance;
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle,bCriticalHit);
+	Damage=bCriticalHit ? Damage*2.f+SourceCriticalHitDamage : Damage;
 	
 	const FGameplayModifierEvaluatedData EvaluatedData(UBaseAttributeSet::GetIncomingDamageAttribute(),EGameplayModOp::Additive,Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);

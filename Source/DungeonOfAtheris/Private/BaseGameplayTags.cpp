@@ -93,10 +93,18 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 		FName("InputTag.4"),
 		FString("Input tag for 4 key"));
 
+	//Damage
 	GameplayTags.Damage=UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Damage"),
 		FString("Damage"));
 
+	GameplayTags.Damage_Fire=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Fire"),
+		FString("Fire Damage Type"));
+
+	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Fire);
+
+	//Hit React
 	GameplayTags.Effects_HitReact=UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Effects.HitReact"),
 		FString("Tag granted when hit reacting"));

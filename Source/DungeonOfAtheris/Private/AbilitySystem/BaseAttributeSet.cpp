@@ -4,6 +4,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraAbilitySystemLibrary.h"
 #include "BaseGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
@@ -151,7 +152,10 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 		if (Props.TargetCharacter!=Props.SourceCharacter)
 		{
 			AAuraPlayerController* PlayerController=Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter,0));
-			PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter);
+			const bool bIsBlockedHit=UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bIsCriticalHit=UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+
+			PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter,bIsBlockedHit,bIsCriticalHit);
 		}
 	}
 }

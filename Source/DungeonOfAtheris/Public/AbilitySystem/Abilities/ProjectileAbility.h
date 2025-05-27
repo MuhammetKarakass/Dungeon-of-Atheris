@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Abilities/BaseGameplayAbility.h"
+#include "AbilitySystem/Abilities/DamageGameplayAbility.h"
 #include "ProjectileAbility.generated.h"
 
 class ABaseProjectile;
@@ -11,13 +11,11 @@ class ABaseProjectile;
  * 
  */
 UCLASS()
-class DUNGEONOFATHERIS_API UProjectileAbility : public UBaseGameplayAbility
+class DUNGEONOFATHERIS_API UProjectileAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 public:
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABaseProjectile> ProjectileClass;

@@ -29,7 +29,7 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount, ACharacter* TargetCharacter)
+void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount, ACharacter* TargetCharacter,bool bIsBlockedHit,bool bIsCriticalHit)
 {
 	if (IsValid(TargetCharacter)&& DamageTextComponentClass)
 	{
@@ -37,7 +37,7 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount,
 		DamageTextComponent->RegisterComponent();//createdefaultsubobject gibi ama dinamik olarak oluşturduk ondan
 		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
 		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageTextComponent->SetDamageText(DamageAmmount);
+		DamageTextComponent->SetDamageText(DamageAmmount,bIsBlockedHit,bIsCriticalHit);
 	}
 }
 
