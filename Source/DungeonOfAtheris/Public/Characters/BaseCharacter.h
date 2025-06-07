@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UNiagaraSystem;
 class UGameplayAbility;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -23,28 +24,49 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; //AbilitySystemInterface function for get ability system component
 	UAttributeSet* GetAttributeSet() const {return AttributeSet;}
 
+	//Combat
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual void Die() override;
-
 	UFUNCTION(NetMulticast,Reliable)
 	virtual void MulticastHandleDeath();
+	virtual FVector GetSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	virtual bool IsDead_Implementation() const override;
+	virtual AActor* GetAvatar_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual int32 GetMinionCount_Implementation() override;
+	virtual void SetMinionCount_Implementation(int32 Amount) override;
+	//Combat
+
+	UPROPERTY(EditAnywhere,Category="Combat")
+	TArray<FTaggedMontage> AttackTaggedMontages;
+
+	UPROPERTY(Editanywhere,Category="Combat")
+    TMap<FGameplayTag,FName> TagToSocket;
+
+	UPROPERTY(Editanywhere,Category="Combat")
+    TObjectPtr<UNiagaraSystem> BloodEffect;
+
+	UPROPERTY(Editanywhere,Category="Combat")
+	TObjectPtr<USoundBase> DeathSound;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 	virtual void InitAbilityActorInfo();
-	virtual FVector GetSocketLocation();
 
 	void ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const;
 	virtual void InitDefaultAttributes() const;
 
 	void AddCharacterAbilities();
 	
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	FName WeaponTipSocketName;
+	// UPROPERTY(EditAnywhere, Category = "Combat")
+	// FName WeaponTipSocketName;
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -60,6 +82,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category = "Attributes")
 	TSubclassOf<class UGameplayEffect> DefaultVitalAttributes;
+
+	int32 MinionCount=0;
 
 	//Dissolve Effects
 
@@ -82,4 +106,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly,Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	bool bDead=false;
 };

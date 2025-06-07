@@ -5,7 +5,6 @@
 
 #include <utility>
 
-#include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
 

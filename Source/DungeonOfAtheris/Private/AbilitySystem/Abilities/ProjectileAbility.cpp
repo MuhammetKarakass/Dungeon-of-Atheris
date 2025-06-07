@@ -18,15 +18,18 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation,const FGameplayTag& Tag)
 {
+	//TODO: Add pitch to projectile to pretend collision to ground and better range 
 	const bool bIsServer=GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
 
 	ICombatInterface *CombatInterface=Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{
-		const FVector SocketLocation=CombatInterface->GetSocketLocation();
+		const FVector SocketLocation = ICombatInterface::Execute_GetSocketLocation(
+		GetAvatarActorFromActorInfo(),
+		Tag);
 		FRotator Rotation=(ProjectileTargetLocation-SocketLocation).Rotation();
 		Rotation.Pitch=0.f;
 		FTransform SpawnTransform;

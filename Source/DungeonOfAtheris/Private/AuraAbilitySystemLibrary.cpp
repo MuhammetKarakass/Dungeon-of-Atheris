@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "BaseAbilityTypes.h"
 #include "Game/AuraGameModeBase.h"
+#include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/BaseHUD.h"
@@ -72,7 +73,7 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC,ECharacterClass CharacterClass)
 {
 	
 	UCharacterClassInfo* CharacterClassInfo=GetCharacterClassInfo(WorldContextObject);
@@ -80,6 +81,15 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 	{
 		FGameplayAbilitySpec AbilitySpec=FGameplayAbilitySpec(AbilityClass);
 		ASC->GiveAbility(AbilitySpec);
+	}
+	const FCharacterClassDefaultInfo& CharacterClassDefaultInfo=CharacterClassInfo->GetDefaultClassInfo(CharacterClass);
+	for (auto AbilityClass: CharacterClassDefaultInfo.StartupAbilities)
+	{
+		if (ICombatInterface* CombatInterface=Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		{
+			FGameplayAbilitySpec AbilitySpec=FGameplayAbilitySpec(AbilityClass,CombatInterface->GetLevel());
+			ASC->GiveAbility(AbilitySpec);
+		}
 	}
 }
 
@@ -131,4 +141,45 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& E
 	{
 		AuraEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
+}
+
+void UAuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject,
+	TArray<AActor*>& OutOverlappingActors,const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin)
+{
+	FCollisionQueryParams SphereParams;
+	SphereParams.AddIgnoredActors(ActorsToIgnore);
+
+	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::LogAndReturnNull))
+	{
+		TArray<FOverlapResult> Overlaps;
+		World->OverlapMultiByObjectType(Overlaps,SphereOrigin,FQuat::Identity,FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects),FCollisionShape::MakeSphere(Radius));
+
+		for (FOverlapResult& Overlap:Overlaps)
+		{
+			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			{
+				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
+			}
+		}
+	}
+}
+
+bool UAuraAbilitySystemLibrary::IsNotFriends(AActor* FirstActor, AActor* SecondActor)
+{
+	bool bBothArePlayers=FirstActor->ActorHasTag(FName("Player"))&&SecondActor->ActorHasTag(FName("Player"));
+	bool bBothAreEnemies=FirstActor->ActorHasTag(FName("Enemy"))&&SecondActor->ActorHasTag(FName("Enemy"));
+
+	bool bFriends=bBothAreEnemies||bBothArePlayers;
+
+	return !bFriends;
+}
+
+FTaggedMontage UAuraAbilitySystemLibrary::GetRandomTaggedMonhtageFromArray(TArray<FTaggedMontage> TaggedMontages)
+{
+	if (TaggedMontages.Num()>0)
+	{
+		int32 Selection=FMath::RandRange(0,TaggedMontages.Num()-1);
+		return TaggedMontages[Selection];
+	}
+	return FTaggedMontage();
 }

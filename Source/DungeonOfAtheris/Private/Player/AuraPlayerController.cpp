@@ -31,7 +31,7 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 
 void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount, ACharacter* TargetCharacter,bool bIsBlockedHit,bool bIsCriticalHit)
 {
-	if (IsValid(TargetCharacter)&& DamageTextComponentClass)
+	if (IsValid(TargetCharacter)&& DamageTextComponentClass&&IsLocalController())
 	{
 		UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter,DamageTextComponentClass);
 		DamageTextComponent->RegisterComponent();//createdefaultsubobject gibi ama dinamik olarak oluşturduk ondan
@@ -97,8 +97,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag Tag)
 				DrawDebugSphere(GetWorld(),PointLoc,10,10,FColor::White,false,5.f);
 			}
 			bAutoRunning=true;
-			CachedDestination=NavPath->PathPoints[NavPath->PathPoints.Num()-1];
-			
+			if (NavPath->PathPoints.Num()>0)
+			{
+				CachedDestination=NavPath->PathPoints[NavPath->PathPoints.Num()-1];
+			}
 		}
 		bTargeting=false;
 		FollowTime=0.f;

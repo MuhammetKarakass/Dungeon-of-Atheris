@@ -24,4 +24,10 @@ public:
 
 	virtual void HiglightActor()=0;
 	virtual void UnHiglightActor()=0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCombatTarget(AActor* InCombatTarget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	AActor* GetCombatTarget();
 };

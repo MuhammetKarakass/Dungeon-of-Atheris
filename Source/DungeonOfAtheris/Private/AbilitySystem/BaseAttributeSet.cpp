@@ -32,6 +32,12 @@ UBaseAttributeSet::UBaseAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_CriticalHitResistance, GetCriticalHitResistanceAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_HealthRegeneration, GetHealthRegenerationAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_ManaRegeneration, GetManaRegenerationAttribute);
+	/* Resistance Attributes */
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Fire,GetFireResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Arcane,GetArcaneResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Lightning,GetLightningResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Physical,GetPhysicalResistanceAttribute);
+	/* Vital Attributes */
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_MaxHealth, GetMaxHealthAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_MaxMana, GetMaxManaAttribute);
 	
@@ -57,6 +63,12 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,CriticalHitResistance,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,HealthRegeneration,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,ManaRegeneration,COND_None,REPNOTIFY_Always);
+	//resistance attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,FireResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,ArcaneResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,LightningResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,PhysicalResistance,COND_None,REPNOTIFY_Always);
+	//vital attributes
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,MaxHealth,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet,MaxMana,COND_None,REPNOTIFY_Always);
 }
@@ -140,7 +152,6 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 					CombatInterface->Die();
 				}
 			}
-
 			else
 			{
 				FGameplayTagContainer Tags;
@@ -148,14 +159,21 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
 			}
 		}
+		const bool bIsBlockedHit=UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+		const bool bIsCriticalHit=UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 
 		if (Props.TargetCharacter!=Props.SourceCharacter)
 		{
-			AAuraPlayerController* PlayerController=Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter,0));
-			const bool bIsBlockedHit=UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
-			const bool bIsCriticalHit=UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			if(AAuraPlayerController* PlayerController=Cast<AAuraPlayerController>(Props.SourceCharacter->Controller))
+			{
+				PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter,bIsBlockedHit,bIsCriticalHit);
+				return;
+			}
+			if(AAuraPlayerController* PlayerController=Cast<AAuraPlayerController>(Props.TargetCharacter->Controller))
+			{
+				PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter,bIsBlockedHit,bIsCriticalHit);
 
-			PlayerController->ShowDamageNumber(LocalIncomingDamage, Props.TargetCharacter,bIsBlockedHit,bIsCriticalHit);
+			}
 		}
 	}
 }
@@ -231,7 +249,27 @@ void UBaseAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& Old
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet,ManaRegeneration,OldManaRegen);
 }
-	
+//Resistance attributes
+void UBaseAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet,FireResistance,OldFireResistance);
+}
+
+void UBaseAttributeSet::OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet,ArcaneResistance,OldArcaneResistance);
+}
+
+void UBaseAttributeSet::OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet,LightningResistance,OldLightningResistance);
+}
+
+void UBaseAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet,PhysicalResistance,OldPhysicalResistance);
+}
+//Vital attributes
 void UBaseAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxHealth , OldMaxHealth);

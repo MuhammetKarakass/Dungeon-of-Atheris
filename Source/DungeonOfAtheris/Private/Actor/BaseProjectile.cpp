@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AuraAbilitySystemLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,20 +47,38 @@ void ABaseProjectile::BeginPlay()
 
 void ABaseProjectile::Destroyed()
 {
-	Super::Destroyed();
 	if (!HasAuthority()&&!bHit)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
+		bHit=true;
 	}
+	Super::Destroyed();
 }
 
 void ABaseProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
-	LoopingSound->Stop();
+	// AActor* Acctor=DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser();
+	// if (Acctor==OtherActor && DamageSpecHandle.Data.IsValid()) return;
+
+	if (DamageSpecHandle.Data.IsValid() && DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+
+	if (!UAuraAbilitySystemLibrary::IsNotFriends(DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	{
+		return;
+	}
+	
+	if (!bHit)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
+		if (LoopingSound)LoopingSound->Stop();
+		bHit=true;
+	}
 
 	if (HasAuthority())
 	{

@@ -14,7 +14,8 @@ enum class ECharacterClass : uint8
 {
 	Elementalist,
 	Warrior,
-	Ranger
+	Ranger,
+	DemonRanger
 };
 
 USTRUCT(BlueprintType)
@@ -24,6 +25,10 @@ struct FCharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly,Category="Class Default")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+
+	UPROPERTY(EditDefaultsOnly,Category="Class Default")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
 };
 
 UCLASS()

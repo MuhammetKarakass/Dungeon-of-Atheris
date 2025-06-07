@@ -128,7 +128,27 @@ public:
 	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_MaxHealth,Category="Secondary Attributes")
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,MaxHealth);
-    
+
+	/*
+	 *Resistance Attributes
+	 */
+
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_FireResistance,Category="Resistance Attributes")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,FireResistance);
+
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_ArcaneResistance,Category="Resistance Attributes")
+	FGameplayAttributeData ArcaneResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,ArcaneResistance);
+
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_LightningResistance,Category="Resistance Attributes")
+	FGameplayAttributeData LightningResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,LightningResistance);
+
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_PhysicalResistance,Category="Resistance Attributes")
+	FGameplayAttributeData PhysicalResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,PhysicalResistance);
+	
 	
 	/*
 	 *Vital Attributes
@@ -200,9 +220,18 @@ public:
 
 	UFUNCTION()
 	void OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegen) const;
-	
-	UFUNCTION(BlueprintCallable)
-	float GetHealthFloat()  const {return GetHealth();};
+
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+
+	UFUNCTION()
+	void OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const;
+
+	UFUNCTION()
+	void OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const;
+
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
 
 protected:
 

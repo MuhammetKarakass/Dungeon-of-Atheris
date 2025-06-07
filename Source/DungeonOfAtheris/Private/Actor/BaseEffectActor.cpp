@@ -23,6 +23,7 @@ void ABaseEffectActor::OnOverlap(AActor* TargetActor)
 {
 	for (const FGameplayEffectStruct& EffectStruct:GameplayEffectStructs)
 	{
+		if (TargetActor->ActorHasTag(FName("Enemy")) && !EffectStruct.bApplyEffectsToEnemies) return;
 		if (EffectStruct.EffectApplicationPolicy==EEffectApplicationPolicy::ApplyOnOverlap)
 		{
 			ApplyEffectToTarget(TargetActor, EffectStruct);
@@ -40,6 +41,7 @@ void ABaseEffectActor::OnEndOverlap(AActor* TargetActor)
 {
 	for (const FGameplayEffectStruct& EffectStruct:GameplayEffectStructs)
 	{
+		if (TargetActor->ActorHasTag(FName("Enemy")) && !EffectStruct.bApplyEffectsToEnemies) return;
 		if (EffectStruct.EffectApplicationPolicy==EEffectApplicationPolicy::ApplyOnEndOverlap)
 		{
 			ApplyEffectToTarget(TargetActor, EffectStruct);
@@ -68,6 +70,7 @@ void ABaseEffectActor::OnEndOverlap(AActor* TargetActor)
 
 void ABaseEffectActor::ApplyEffectToTarget(AActor* ActorTarget,const FGameplayEffectStruct& GameplayEffectStruct)
 {
+	if (ActorTarget->ActorHasTag(FName("Enemy")) && !GameplayEffectStruct.bApplyEffectsToEnemies) return;
 	if (UAbilitySystemComponent* TargetASC= UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ActorTarget))
 	{
 		check(GameplayEffectStruct.GameplayEffectClass);
@@ -85,6 +88,11 @@ void ABaseEffectActor::ApplyEffectToTarget(AActor* ActorTarget,const FGameplayEf
 		if (bIsInfinite && GameplayEffectStruct.EffectRemovalPolicy==EEffectRemovalPolicy::RemoveOnEndOverlap)
 		{
 			ActiveGameplayEffects.Add(ActiveEffectHandle,TargetASC);
+		}
+
+		if (!bIsInfinite && GameplayEffectStruct.bDestroyedOnEffectApplication)
+		{
+			Destroy();
 		}
 	}
 }

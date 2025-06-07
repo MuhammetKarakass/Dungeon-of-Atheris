@@ -2,11 +2,13 @@
 
 
 #include "Characters/EnemyCharacter.h"
-
 #include "AuraAbilitySystemLibrary.h"
+#include "AI/BaseAIController.h"
 #include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/UserWidget/BaseUserWidget.h"
@@ -21,8 +23,13 @@ AEnemyCharacter::AEnemyCharacter()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
-	HealthBar->SetupAttachment(GetRootComponent()); 
-	
+	HealthBar->SetupAttachment(GetRootComponent());
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
 
 
@@ -31,7 +38,7 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed=BaseWalkSpeed;
 	InitAbilityActorInfo();
-	UAuraAbilitySystemLibrary::GiveStartupAbilities(this,AbilitySystemComponent);
+	if (HasAuthority())UAuraAbilitySystemLibrary::GiveStartupAbilities(this,AbilitySystemComponent,CharacterClass);
 
 	if (UBaseUserWidget* UserWidget=Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -63,13 +70,29 @@ void AEnemyCharacter::BeginPlay()
  {
  	bHitReacting=NewCount>0;
  	GetCharacterMovement()->MaxWalkSpeed=bHitReacting ? 0.f:BaseWalkSpeed;
+	if (AIController&&AIController->GetBlackboardComponent())
+	{
+		AIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"),bHitReacting);
+	}
+
  }
+
+void AEnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if (!HasAuthority()) return;
+	AIController=Cast<ABaseAIController>(NewController);
+	AIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	AIController->RunBehaviorTree(BehaviorTree);
+	AIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"),false);
+	AIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"),CharacterClass!=ECharacterClass::Warrior);
+}
 
 void AEnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	InitDefaultAttributes();
+	if (HasAuthority())InitDefaultAttributes();
 }
 
 void AEnemyCharacter::InitDefaultAttributes() const
@@ -94,6 +117,7 @@ void AEnemyCharacter::UnHiglightActor()
 void AEnemyCharacter::Die()
 {
 	SetLifeSpan(LifeSpan);
+	if (AIController) AIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"),true);
 	Super::Die();
 }
 

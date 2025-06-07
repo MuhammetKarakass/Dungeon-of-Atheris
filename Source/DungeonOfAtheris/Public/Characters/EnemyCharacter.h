@@ -9,6 +9,8 @@
 #include  "UI/WidgetController/OverlayWidgetController.h"
 #include "EnemyCharacter.generated.h"
 
+class ABaseAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -31,6 +33,11 @@ public:
 	virtual int32 GetLevel() override;
 
 	void HitReactTagChanged(const FGameplayTag CallbackTag,int32 NewCount);
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() override;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangeSignature OnHealthChanged;
@@ -62,5 +69,23 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
-	
+
+	UPROPERTY(EditDefaultsOnly,Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<AActor> CombatTarget;
+
+	UPROPERTY()
+	TObjectPtr<ABaseAIController> AIController;
 };
+
+inline void AEnemyCharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+inline AActor* AEnemyCharacter::GetCombatTarget_Implementation()
+{
+	return CombatTarget;
+}

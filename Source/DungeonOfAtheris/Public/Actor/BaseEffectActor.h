@@ -43,6 +43,12 @@ struct FGameplayEffectStruct
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	float EffectLevel=1.f;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
+	bool bDestroyedOnEffectApplication=false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
+	bool bApplyEffectsToEnemies=false;
+
 };
 
 UCLASS()

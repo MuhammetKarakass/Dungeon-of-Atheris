@@ -4,9 +4,11 @@
 #include "Characters/BaseCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "DungeonOfAtheris/DungeonOfAtheris.h"
+#include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -41,6 +43,7 @@ void ABaseCharacter::Die()
 
 void ABaseCharacter::MulticastHandleDeath_Implementation()
 {
+	UGameplayStatics::PlaySoundAtLocation(this,DeathSound,GetActorLocation(),GetActorRotation());
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -52,6 +55,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation()
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
+	bDead = true;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -64,10 +68,64 @@ void ABaseCharacter::InitAbilityActorInfo()
 {
 }
 
-FVector ABaseCharacter::GetSocketLocation()
+FVector ABaseCharacter::GetSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	for (auto Pair: TagToSocket)
+	{
+		if (MontageTag.MatchesTagExact(Pair.Key))
+		{
+			if (Pair.Key.MatchesTagExact(FBaseGameplayTags::Get().CombatSocket_Weapon))
+			{
+				return Weapon->GetSocketLocation(Pair.Value);
+			}
+			else
+			{
+				return GetMesh()->GetSocketLocation(Pair.Value);
+			}
+		}
+	}
+	return FVector::ZeroVector;
+}
+bool ABaseCharacter::IsDead_Implementation() const
+{
+	return bDead;
+}
+
+AActor* ABaseCharacter::GetAvatar_Implementation()
+{
+	return this;
+}
+
+TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
+{
+	return AttackTaggedMontages;
+}
+
+UNiagaraSystem* ABaseCharacter::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
+}
+
+FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for (FTaggedMontage TaggedMontage: AttackTaggedMontages)
+	{
+		if (TaggedMontage.MontageTag==MontageTag)
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
+}
+
+int32 ABaseCharacter::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
+void ABaseCharacter::SetMinionCount_Implementation(int32 Amount)
+{
+	MinionCount+=Amount;
 }
 
 
