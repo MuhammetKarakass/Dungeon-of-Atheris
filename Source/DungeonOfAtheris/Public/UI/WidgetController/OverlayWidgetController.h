@@ -7,6 +7,7 @@
 #include "UI/WidgetController/BaseWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+class UAbilityInfo;
 class UBaseUserWidget;
 struct FGameplayTag;
 struct FOnAttributeChangeData;
@@ -58,8 +59,11 @@ public:
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
 protected:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Wisget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Wisget Data")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag);
