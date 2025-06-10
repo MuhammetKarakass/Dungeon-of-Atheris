@@ -7,7 +7,7 @@
 #include "Engine/DataAsset.h"
 #include "AttributeInfo.generated.h"
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType,Blueprintable)
 struct FAuraAttributeInfo
 {
 	GENERATED_BODY()

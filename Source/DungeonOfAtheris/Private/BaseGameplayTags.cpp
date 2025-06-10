@@ -149,7 +149,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 		FName("Abilities.Fire.FireBolt"),
 		FString("FireBolt Ability Tag"));
 	
-	
+	GameplayTags.Cooldown_Fire_FireBolt=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.FireBolt"),
+		FString("Cooldown Fire Ability Tag"));
 //Combat Sockets
 
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(

@@ -1,16 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "UI/WidgetController/BaseWidgetController.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
+#include "AbilitySystem/Data/AbilityInfoNew.h"
 #include "OverlayWidgetController.generated.h"
 
-class UAbilityInfo;
+class UBaseAbilitySystemComponent;
 class UBaseUserWidget;
 struct FGameplayTag;
 struct FOnAttributeChangeData;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangeSignature,float,NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfoNew&, Info);
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow:public FTableRowBase
@@ -29,8 +33,6 @@ struct FUIWidgetRow:public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TObjectPtr<UTexture2D> Image=nullptr;
 };
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangeSignature,float,NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
 /**
@@ -58,12 +60,23 @@ public:
 	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
+	// UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
+	// FAbilityInfoSignature AbilityInfoDelegate;
+
+	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
+	FAbilityInfoSignature AbilityInfoDelegateNew;
+
 protected:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Wisget Data")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Wisget Data")
-	TObjectPtr<UAbilityInfo> AbilityInfo;
+	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
+	// TObjectPtr<UAbilityInfo> AbilityInfo;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
+	TObjectPtr<UAbilityInfoNew> AbilityInfoNew;
+
+	void OnInıtialieStartupAbilities(UBaseAbilitySystemComponent* AbilitySystemComponent);
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag);

@@ -11,6 +11,8 @@
  */
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UBaseAbilitySystemComponent*)
+DECLARE_DELEGATE_OneParam(FForEachAbility,const FGameplayAbilitySpec&)
 
 UCLASS()
 class DUNGEONOFATHERIS_API UBaseAbilitySystemComponent : public UAbilitySystemComponent
@@ -22,10 +24,21 @@ public:
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+	void ForEachAbility(const FForEachAbility& Delegate);
 
 	FEffectAssetTags EffectAssetTags;
+	FAbilitiesGiven AbilitiesGivenDelegate;
+
+	bool bStartupAbilitiesGiven=false;
+
+	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 protected:
 
+	virtual void OnRep_ActivateAbilities() override;
+	
 	UFUNCTION(Client,Reliable)
 	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
+
 };
+

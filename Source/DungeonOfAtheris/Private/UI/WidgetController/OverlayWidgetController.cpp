@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -40,23 +41,48 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	}
 	);
 	
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate
-	(AuraAttributeSet->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
+	if (UBaseAbilitySystemComponent* AuraASC=Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
 	{
-		OnMaxManaChanged.Broadcast(Data.NewValue);
-	});
-	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
-		[this](const FGameplayTagContainer& TagContainer)
+
+		if (AuraASC->bStartupAbilitiesGiven)
 		{
-			for (const FGameplayTag& Tag : TagContainer)
+			OnInıtialieStartupAbilities(AuraASC);
+		}
+		else
+		{
+			AuraASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInıtialieStartupAbilities);
+		}
+		
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate
+	   (AuraAttributeSet->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
+	   {
+		   OnMaxManaChanged.Broadcast(Data.NewValue);
+	   });
+		AuraASC->EffectAssetTags.AddLambda(
+			[this](const FGameplayTagContainer& TagContainer)
 			{
-				FGameplayTag MessageTag=FGameplayTag::RequestGameplayTag(FName("Message"));
-				
-				if (Tag.MatchesTag(MessageTag))
+				for (const FGameplayTag& Tag : TagContainer)
 				{
-					const FUIWidgetRow* WidgetRow=GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable,Tag);
-				    MessageWidgetRowDelegate.Broadcast(*WidgetRow);
+					FGameplayTag MessageTag=FGameplayTag::RequestGameplayTag(FName("Message"));
+				
+					if (Tag.MatchesTag(MessageTag))
+					{
+						const FUIWidgetRow* WidgetRow=GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable,Tag);
+						MessageWidgetRowDelegate.Broadcast(*WidgetRow);
+					}
 				}
-			}
-		});
+			});
+	}
+}
+
+void UOverlayWidgetController::OnInıtialieStartupAbilities(UBaseAbilitySystemComponent* AuraAbilitySystemComponent)
+{
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this, AuraAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		FAuraAbilityInfoNew Info = AbilityInfoNew->FındAbilityInformationForTag(AuraAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag = AuraAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+		AbilityInfoDelegateNew.Broadcast(Info);
+	});
+	AuraAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }

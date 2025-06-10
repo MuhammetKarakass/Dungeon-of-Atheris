@@ -62,7 +62,7 @@ void ABaseProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	// AActor* Acctor=DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser();
 	// if (Acctor==OtherActor && DamageSpecHandle.Data.IsValid()) return;
 
-	if (DamageSpecHandle.Data.IsValid() && DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	if (!DamageSpecHandle.Data.IsValid() || DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
 	{
 		return;
 	}
