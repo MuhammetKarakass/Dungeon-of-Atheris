@@ -85,9 +85,9 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 	const FCharacterClassDefaultInfo& CharacterClassDefaultInfo=CharacterClassInfo->GetDefaultClassInfo(CharacterClass);
 	for (auto AbilityClass: CharacterClassDefaultInfo.StartupAbilities)
 	{
-		if (ICombatInterface* CombatInterface=Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
 		{
-			FGameplayAbilitySpec AbilitySpec=FGameplayAbilitySpec(AbilityClass,CombatInterface->GetLevel());
+			FGameplayAbilitySpec AbilitySpec=FGameplayAbilitySpec(AbilityClass,ICombatInterface::Execute_GetLevel(ASC->GetAvatarActor()));
 			ASC->GiveAbility(AbilitySpec);
 		}
 	}
@@ -182,4 +182,16 @@ FTaggedMontage UAuraAbilitySystemLibrary::GetRandomTaggedMonhtageFromArray(TArra
 		return TaggedMontages[Selection];
 	}
 	return FTaggedMontage();
+}
+
+int32 UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject,
+	ECharacterClass CharacterClass, float level)
+{
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return 0;
+
+	const FCharacterClassDefaultInfo& Info = CharacterClassInfo->GetDefaultClassInfo(CharacterClass);
+	const float XPReward = Info.XPReward.GetValueAtLevel(level);
+
+	return static_cast<int32>(XPReward);
 }

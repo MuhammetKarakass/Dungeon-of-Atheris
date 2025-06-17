@@ -5,8 +5,10 @@
 
 #include <utility>
 
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
+#include "Player/AuraPlayerState.h"
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
@@ -23,6 +25,9 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
         }
 		);
 	}
+	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	AttributePointsChangeDelegate.Broadcast(AuraPlayerState->GetAttributePoints());
+	UE_LOG(LogTemp,Warning,TEXT("AttributePoints:%d"),AuraPlayerState->GetAttributePoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
@@ -40,4 +45,17 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 		Info.AttributeValue = Pair.Value().GetNumericValue(AS);
 		AttributeInfoDelegate.Broadcast(Info);
 	}
+
+	AAuraPlayerState* AuraPlayerState=CastChecked<AAuraPlayerState>(PlayerState);
+	AuraPlayerState->OnAttributePointsCanChangeDelegate.AddLambda(
+		[this](const int32 Points)
+		{
+			AttributePointsChangeDelegate.Broadcast(Points);
+		});
+}
+
+void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	UBaseAbilitySystemComponent* ASC=CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+	ASC->UpgradeAttribute(AttributeTag);
 }

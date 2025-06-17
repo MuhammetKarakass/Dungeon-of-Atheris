@@ -121,7 +121,7 @@ void AEnemyCharacter::Die()
 	Super::Die();
 }
 
-int32 AEnemyCharacter::GetLevel()
+int32 AEnemyCharacter::GetLevel_Implementation()
 {
 	return Level;
 }

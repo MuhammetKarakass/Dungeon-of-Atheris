@@ -128,6 +128,11 @@ void ABaseCharacter::SetMinionCount_Implementation(int32 Amount)
 	MinionCount+=Amount;
 }
 
+ECharacterClass ABaseCharacter::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
+}
+
 
 void ABaseCharacter::ApplyEffectToSelf(TSubclassOf<class UGameplayEffect> Effect, float level) const
 {
@@ -150,9 +155,10 @@ void ABaseCharacter::InitDefaultAttributes() const
 void ABaseCharacter::AddCharacterAbilities()
 {
 	if (!HasAuthority()) return;
-	if (UBaseAbilitySystemComponent* ABC=Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	if (UBaseAbilitySystemComponent* ASC=Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
 	{
-		ABC->AddCharacterAbilities(Abilities);
+		ASC->AddCharacterAbilities(Abilities);
+		ASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 	}
 	
 }

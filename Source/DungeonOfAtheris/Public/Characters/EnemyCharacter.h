@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Characters/BaseCharacter.h"
 #include "Interaction/EnemyInterface.h"
 #include  "UI/WidgetController/OverlayWidgetController.h"
@@ -30,7 +29,7 @@ public:
 	virtual void Die() override;
 	// end Enemy Interface
 
-	virtual int32 GetLevel() override;
+	virtual int32 GetLevel_Implementation() override;
 
 	void HitReactTagChanged(const FGameplayTag CallbackTag,int32 NewCount);
 
@@ -63,10 +62,7 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Class Defaults")
 	int32 Level=1;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Class Defaults")
-	ECharacterClass CharacterClass=ECharacterClass::Warrior;
-
+	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
 

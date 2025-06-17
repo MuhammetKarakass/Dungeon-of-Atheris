@@ -3,8 +3,10 @@
 
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "BaseGameplayTags.h"
 #include "AbilitySystem/Abilities/BaseGameplayAbility.h"
+#include "Interaction/PlayerInterface.h"
 
 
 void UBaseAbilitySystemComponent::AbilityActorInfoSet()
@@ -27,6 +29,16 @@ void UBaseAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 	}
 	bStartupAbilitiesGiven=true;
 	AbilitiesGivenDelegate.Broadcast(this);
+}
+
+void UBaseAbilitySystemComponent::AddCharacterPassiveAbilities(
+	const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility> AbilityClass:StartupPassiveAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
 }
 
 void UBaseAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -108,6 +120,31 @@ FGameplayTag UBaseAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 		}
 	}
 	return FGameplayTag();
+}
+
+void UBaseAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if (IPlayerInterface::Execute_GetAttributePoints(GetAvatarActor())>0)
+		{
+			ServerUpgradeAttribute(AttributeTag);
+		}
+	}
+}
+
+void UBaseAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag=AttributeTag;
+	Payload.EventMagnitude=1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(),AttributeTag,Payload);
+
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_AddToAttributePoints(GetAvatarActor(),-1);
+	}
 }
 
 void UBaseAbilitySystemComponent::OnRep_ActivateAbilities()

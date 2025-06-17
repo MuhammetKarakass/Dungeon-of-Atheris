@@ -37,6 +37,7 @@ public:
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual int32 GetMinionCount_Implementation() override;
 	virtual void SetMinionCount_Implementation(int32 Amount) override;
+	virtual ECharacterClass GetCharacterClass_Implementation() override;
 	//Combat
 
 	UPROPERTY(EditAnywhere,Category="Combat")
@@ -82,7 +83,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category = "Attributes")
 	TSubclassOf<class UGameplayEffect> DefaultVitalAttributes;
-
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Class Defaults")
+	ECharacterClass CharacterClass=ECharacterClass::Warrior;
+	
 	int32 MinionCount=0;
 
 	//Dissolve Effects
@@ -104,6 +108,9 @@ private:
 	UPROPERTY(EditAnywhere, Category="Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> Abilities;
 
+	UPROPERTY(EditAnywhere, Category="Abilites")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
+	
 	UPROPERTY(EditDefaultsOnly,Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 

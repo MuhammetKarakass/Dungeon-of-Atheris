@@ -26,6 +26,10 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 		FName("Attributes.Primary.Vigor"),
 		FString("Increases Health"));
 
+	GameplayTags.Attribute_Meta_IncomingXP=UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Meta.IncomingXP"),
+		FString("Meta IncomingXP Attribute Tag"));
+
 
 	//Secondary Attributes Tags
 	GameplayTags.Attribute_Secondary_Armor=UGameplayTagsManager::Get().AddNativeGameplayTag

@@ -57,4 +57,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static FTaggedMontage GetRandomTaggedMonhtageFromArray(TArray<FTaggedMontage> TaggedMontages);
+
+	static int32  GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass,float level);
 };

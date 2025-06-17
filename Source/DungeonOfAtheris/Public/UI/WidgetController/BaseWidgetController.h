@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
-#include "UObject/NoExportTypes.h"
 #include "BaseWidgetController.generated.h"
 
 class UAttributeSet;
 class UAbilitySystemComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangeSignature,int32,NewValue);
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -43,6 +44,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	UFUNCTION(BlueprintCallable)
 	virtual void BindCallbacksToDependencies();

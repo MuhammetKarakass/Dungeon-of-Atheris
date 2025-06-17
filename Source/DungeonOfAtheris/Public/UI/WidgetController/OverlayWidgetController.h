@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "UI/WidgetController/BaseWidgetController.h"
-#include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/AbilityInfoNew.h"
 #include "OverlayWidgetController.generated.h"
 
@@ -60,11 +59,14 @@ public:
 	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
-	// UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
-	// FAbilityInfoSignature AbilityInfoDelegate;
-
 	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
 	FAbilityInfoSignature AbilityInfoDelegateNew;
+	
+	UPROPERTY(BlueprintAssignable,Category="GAS|XP")
+	FOnAttributeChangeSignature OnPercentChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable,Category="GAS|XP")
+	FOnPlayerStatChangeSignature OnPlayerLevelChangeDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
@@ -80,6 +82,8 @@ protected:
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag);
+
+	void OnXPChanged(int32 NewXP)const;
 };
 
 template <typename T>
