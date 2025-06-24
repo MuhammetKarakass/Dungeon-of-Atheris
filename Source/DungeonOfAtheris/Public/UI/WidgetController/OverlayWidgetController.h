@@ -13,7 +13,6 @@ struct FGameplayTag;
 struct FOnAttributeChangeData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangeSignature,float,NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfoNew&, Info);
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow:public FTableRowBase
@@ -58,9 +57,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
-
-	UPROPERTY(BlueprintAssignable,Category="GAS|Messages")
-	FAbilityInfoSignature AbilityInfoDelegateNew;
 	
 	UPROPERTY(BlueprintAssignable,Category="GAS|XP")
 	FOnAttributeChangeSignature OnPercentChangedDelegate;
@@ -74,16 +70,13 @@ protected:
 
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
 	// TObjectPtr<UAbilityInfo> AbilityInfo;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")
-	TObjectPtr<UAbilityInfoNew> AbilityInfoNew;
-
-	void OnInıtialieStartupAbilities(UBaseAbilitySystemComponent* AbilitySystemComponent);
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable,const FGameplayTag& Tag);
 
-	void OnXPChanged(int32 NewXP)const;
+	void OnXPChanged(int32 NewXP);
+
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot) const;
 };
 
 template <typename T>

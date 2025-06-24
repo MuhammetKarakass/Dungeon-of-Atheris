@@ -6,6 +6,7 @@
 #include "UI/UserWidget/BaseUserWidget.h"
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/SpellMenuWidgetController.h"
 
 UOverlayWidgetController* ABaseHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {
@@ -27,6 +28,17 @@ UAttributeMenuWidgetController* ABaseHUD::GetAttributeMenuWidgetController(const
 		AttributeMenuWidgetController->BindCallbacksToDependencies();
 	}
 	return AttributeMenuWidgetController;
+}
+
+USpellMenuWidgetController* ABaseHUD::GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (SpellMenuWidgetController == nullptr)
+	{
+		SpellMenuWidgetController = NewObject<USpellMenuWidgetController>(this, SpellMenuWidgetControllerClass);
+		SpellMenuWidgetController->SetWidgetControllerParams(WCParams);
+		SpellMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return SpellMenuWidgetController;
 }
 
 void ABaseHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)

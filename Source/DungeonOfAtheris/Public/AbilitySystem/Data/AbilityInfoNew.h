@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "AbilityInfoNew.generated.h"
+class UGameplayAbility;
 
 USTRUCT(BlueprintType)
 struct FAuraAbilityInfoNew
@@ -21,12 +22,25 @@ struct FAuraAbilityInfoNew
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	FGameplayTag CooldownTag=FGameplayTag();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityType = FGameplayTag();
+
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TObjectPtr<UTexture2D> AbilityIcon=nullptr;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TObjectPtr<UMaterialInterface> BackgroundMaterial=nullptr;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag StatusTag=FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 LevelRequirement = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> Ability;
 };
+
 
 UCLASS()
 class DUNGEONOFATHERIS_API UAbilityInfoNew : public UDataAsset

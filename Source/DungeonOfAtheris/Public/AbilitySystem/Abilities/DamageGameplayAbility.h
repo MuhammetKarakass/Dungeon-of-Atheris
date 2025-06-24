@@ -24,5 +24,9 @@ protected:
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	TMap<FGameplayTag,FScalableFloat> DamageTypes;
+	FGameplayTag DamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FScalableFloat Damage;
+	
 };

@@ -9,6 +9,7 @@
 #include "Actor/BaseProjectile.h"
 #include "Interaction/CombatInterface.h"
 
+
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                          const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
                                          const FGameplayEventData* TriggerEventData)
@@ -57,3 +58,5 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }
+
+

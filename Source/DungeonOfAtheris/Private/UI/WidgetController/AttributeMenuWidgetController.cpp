@@ -12,42 +12,37 @@
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
-	UBaseAttributeSet* AS=CastChecked<UBaseAttributeSet>(AttributeSet);
-
-	for (auto& Pair: AS->TagsToAttributes)
+	for (auto& Pair: GetAuraAS()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
-        [this,Pair,AS](const FOnAttributeChangeData& Data)
+        [this,Pair](const FOnAttributeChangeData& Data)
         {
 	        FAuraAttributeInfo Info=AttributeInfo->FindAttributeInfoForTag(Pair.Key);
-        	Info.AttributeValue=Pair.Value().GetNumericValue(AS);
+        	Info.AttributeValue=Pair.Value().GetNumericValue(GetAuraAS());
         	AttributeInfoDelegate.Broadcast(Info);
         }
 		);
 	}
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	AttributePointsChangeDelegate.Broadcast(AuraPlayerState->GetAttributePoints());
+	AttributePointsChangeDelegate.Broadcast(GetAuraPS()->GetAttributePoints());
 	UE_LOG(LogTemp,Warning,TEXT("AttributePoints:%d"),AuraPlayerState->GetAttributePoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
-	UBaseAttributeSet* AS=CastChecked<UBaseAttributeSet>(AttributeSet);
 	check(AttributeInfo);
 
 	// FAuraAttributeInfo Info=AttributeInfo->FindAttributeInfoForTag(FBaseGameplayTags::Get().Attribute_Primary_Vigor);
 	// Info.AttributeValue=AS->GetVigor();
 	// AttributeInfoDelegate.Broadcast(Info);
 
-	for (auto& Pair : AS->TagsToAttributes)
+	for (auto& Pair : GetAuraAS()->TagsToAttributes)
 	{
 		FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
-		Info.AttributeValue = Pair.Value().GetNumericValue(AS);
+		Info.AttributeValue = Pair.Value().GetNumericValue(GetAuraAS());
 		AttributeInfoDelegate.Broadcast(Info);
 	}
-
-	AAuraPlayerState* AuraPlayerState=CastChecked<AAuraPlayerState>(PlayerState);
-	AuraPlayerState->OnAttributePointsCanChangeDelegate.AddLambda(
+	
+	GetAuraPS()->OnAttributePointsCanChangeDelegate.AddLambda(
 		[this](const int32 Points)
 		{
 			AttributePointsChangeDelegate.Broadcast(Points);

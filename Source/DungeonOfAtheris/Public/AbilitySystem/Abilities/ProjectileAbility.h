@@ -14,7 +14,7 @@ UCLASS()
 class DUNGEONOFATHERIS_API UProjectileAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
-public:
+
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -24,4 +24,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile(const FVector& ProjectileTargetLocation,const FGameplayTag& Tag);
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 NumProjectiles = 5;
 };

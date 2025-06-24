@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "AuraGameModeBase.generated.h"
 
+class UAbilityInfoNew;
 class UCharacterClassInfo;
 /**
  * 
@@ -18,4 +19,7 @@ class DUNGEONOFATHERIS_API AAuraGameModeBase : public AGameModeBase
 public:
 	UPROPERTY(EditDefaultsOnly,Category="Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
+
+	UPROPERTY(EditDefaultsOnly,Category="Abilites")
+	TObjectPtr<UAbilityInfoNew> AbilityInfo;
 };

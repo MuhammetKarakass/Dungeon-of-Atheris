@@ -35,7 +35,7 @@ public:
 
 protected:
 	UPROPERTY()
-	UAbilitySystemComponent* AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	FGameplayTag CooldownTag;
 
