@@ -26,7 +26,7 @@ public:
 	// begin Enemy Interface
 	virtual void HiglightActor() override;
 	virtual void UnHiglightActor() override;
-	virtual void Die() override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	// end Enemy Interface
 
 	virtual int32 GetLevel_Implementation() override;
@@ -47,8 +47,6 @@ public:
 	UPROPERTY(BlueprintReadOnly,Category="Combat")
 	bool bHitReacting=false;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
-	float BaseWalkSpeed=250.f;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
 	float LifeSpan=5.f;
@@ -59,6 +57,8 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 
 	virtual void InitDefaultAttributes() const override;
+
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Class Defaults")
 	int32 Level=1;

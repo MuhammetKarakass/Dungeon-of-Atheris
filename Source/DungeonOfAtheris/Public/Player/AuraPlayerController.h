@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "AuraPlayerController.generated.h"
 
+class UNiagaraSystem;
 class UDamageTextComponent;
 class USplineComponent;
 class UBaseAbilitySystemComponent;
@@ -64,6 +65,9 @@ private:
 
 	UPROPERTY(EditAnywhere,Category = Input)
 	TObjectPtr<UAuraInputConfig>InputConfig;
+
+	UPROPERTY(EditDefaultsOnly)
+    TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 	
 	UPROPERTY()
 	TObjectPtr <UBaseAbilitySystemComponent> AbilitySystemComponent;

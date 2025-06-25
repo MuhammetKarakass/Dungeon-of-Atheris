@@ -244,7 +244,10 @@ protected:
 private:
 
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
-	void SendXPEvent(const FEffectProperties& Props) const;
+	void SendXPEvent(const FEffectProperties& Props);
+	void Debuff(const FEffectProperties& Props);
+	void HandleIncomingDamage(const FEffectProperties& Props);
+	void HandleIncomingXP(const FEffectProperties& Props);
 
 	bool bTopOffHealth = false;
 	bool bTopOffMana = false;

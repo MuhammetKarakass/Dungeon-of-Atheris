@@ -30,6 +30,8 @@ AEnemyCharacter::AEnemyCharacter()
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
+	BaseWalkSpeed = 250.f;
 }
 
 
@@ -93,6 +95,17 @@ void AEnemyCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	if (HasAuthority())InitDefaultAttributes();
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AEnemyCharacter::StunTagChanged);
+}
+
+void AEnemyCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+	
+	if (AIController && AIController->GetBlackboardComponent())
+	{
+		AIController->GetBlackboardComponent()->SetValueAsBool(FName("Stunned"), bIsStunned);
+	}
 }
 
 void AEnemyCharacter::InitDefaultAttributes() const
@@ -114,11 +127,11 @@ void AEnemyCharacter::UnHiglightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
-void AEnemyCharacter::Die()
+void AEnemyCharacter::Die(const FVector& DeathImpulse)
 {
 	SetLifeSpan(LifeSpan);
 	if (AIController) AIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"),true);
-	Super::Die();
+	Super::Die(DeathImpulse);
 }
 
 int32 AEnemyCharacter::GetLevel_Implementation()

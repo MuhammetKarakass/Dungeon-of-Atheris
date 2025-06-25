@@ -4,15 +4,19 @@
 #include "Characters/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "BaseGameplayTags.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/BaseHUD.h"
+
+struct FBaseGameplayTags;
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -79,6 +83,8 @@ void AAuraCharacter::InitAbilityActorInfo()
 		Cast<UBaseAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 		AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 		AttributeSet = AuraPlayerState->GetAttributeSet();
+		OnAscRegistered.Broadcast(AbilitySystemComponent);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAuraCharacter::StunTagChanged);
 		if (AAuraPlayerController* AuraController=Cast<AAuraPlayerController>(GetController()))
 		{
 			if (ABaseHUD* BaseHUD=Cast<ABaseHUD>(AuraController->GetHUD()))
@@ -87,6 +93,41 @@ void AAuraCharacter::InitAbilityActorInfo()
 			}
 		}
 		InitDefaultAttributes();
+	}
+}
+
+void AAuraCharacter::OnRep_Stunned()
+{
+	if (UBaseAbilitySystemComponent* AuraASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+		FGameplayTagContainer BlockedTags;
+		BlockedTags.AddTag(GameplayTags.Player_Block_CursorTrace);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputHeld);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputPressed);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputReleased);
+		if (bIsStunned)
+		{
+			AuraASC->AddLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Activate();
+		}
+		else
+		{
+			AuraASC->RemoveLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Deactivate();
+		}
+	}
+}
+
+void AAuraCharacter::OnRep_Burned()
+{
+	if (bIsBurned)
+	{
+		BurnDebuffComponent->Activate();
+	}
+	else
+	{
+		BurnDebuffComponent->Deactivate();
 	}
 }
 

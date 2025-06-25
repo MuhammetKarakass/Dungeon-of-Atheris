@@ -33,6 +33,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		Tag);
 		FRotator Rotation=(ProjectileTargetLocation-SocketLocation).Rotation();
 		Rotation.Pitch=0.f;
+		
 		FTransform SpawnTransform;
 		SpawnTransform.SetRotation(Rotation.Quaternion());
 		SpawnTransform.SetLocation(SocketLocation);
@@ -44,17 +45,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		
-		const UAbilitySystemComponent* ASC=UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-		const FGameplayEffectContextHandle ContextHandle=ASC->MakeEffectContext();
-		const FGameplayEffectSpecHandle SpecHandle=ASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),ContextHandle);
-
-		for (auto Pair: DamageTypes)
-		{
-			const float ScaledDamage= Pair.Value.GetValueAtLevel(GetAbilityLevel());
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,Pair.Key,ScaledDamage);
-		}
-		
-		Projectile->DamageSpecHandle=SpecHandle;
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Input/AuraInputComponent.h"
 #include "Input/AuraInputConfig.h"
 #include "Interaction/EnemyInterface.h"
@@ -61,16 +62,26 @@ void AAuraPlayerController::AutoRun()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag Tag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	
 	if (Tag.MatchesTagExact(FBaseGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting=CurrentActor ? true : false;
 		bAutoRunning=false;
 	}
-	
+	if (GetASC()) GetASC()->AbilityInputTagPressed(Tag);
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag Tag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+	
 	if (!Tag.MatchesTagExact(FBaseGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -94,12 +105,16 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag Tag)
 			for (const FVector& PointLoc:NavPath->PathPoints)
 			{
 				Spline->AddSplinePoint(PointLoc,ESplineCoordinateSpace::World);
-				DrawDebugSphere(GetWorld(),PointLoc,10,10,FColor::White,false,5.f);
 			}
-			bAutoRunning=true;
+			
 			if (NavPath->PathPoints.Num()>0)
 			{
 				CachedDestination=NavPath->PathPoints[NavPath->PathPoints.Num()-1];
+				bAutoRunning=true;
+			}
+			if (GetASC() && !GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 			}
 		}
 		bTargeting=false;
@@ -153,6 +168,14 @@ UBaseAbilitySystemComponent* AAuraPlayerController::GetASC()
 void AAuraPlayerController::CursorTrace()
 {
 
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		if (LastActor) LastActor->UnHiglightActor();
+		if (CurrentActor) CurrentActor->UnHiglightActor();
+		LastActor = nullptr;
+		CurrentActor = nullptr;
+		return;
+	}
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	LastActor=CurrentActor;
@@ -239,6 +262,10 @@ void AAuraPlayerController::SetupInputComponent()
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
 	const FVector2D InputAxisVector=InputActionValue.Get<FVector2D>();
 	const FRotator Rotation=GetControlRotation();
 	const FRotator YawRotation(0.f,Rotation.Yaw,0.f);

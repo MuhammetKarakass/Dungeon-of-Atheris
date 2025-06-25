@@ -41,18 +41,31 @@ void ABaseProjectile::BeginPlay()
 	Super::BeginPlay();
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseProjectile::OnSphereOverlap);
 	LoopingSound = UGameplayStatics::SpawnSoundAttached(FloatingSound,GetRootComponent());
+	SetReplicateMovement(true);
 	SetLifeSpan(LifeSpan);
 	
 }
 
+void ABaseProjectile::OnHit()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	if (LoopingSound)
+	{
+		LoopingSound->Stop();
+		LoopingSound->DestroyComponent();
+	}
+	bHit = true;
+}
+
 void ABaseProjectile::Destroyed()
 {
-	if (!HasAuthority()&&!bHit)
+	if (LoopingSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
-		bHit=true;
+		LoopingSound->Stop();
+		LoopingSound->DestroyComponent();
 	}
+	if (!bHit && !HasAuthority()) OnHit();
 	Super::Destroyed();
 }
 
@@ -61,32 +74,33 @@ void ABaseProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	// AActor* Acctor=DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser();
 	// if (Acctor==OtherActor && DamageSpecHandle.Data.IsValid()) return;
-
-	if (!DamageSpecHandle.Data.IsValid() || DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
-	{
-		return;
-	}
-
-	if (!UAuraAbilitySystemLibrary::IsNotFriends(DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
-	{
-		return;
-	}
-	
-	if (!bHit)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
-		if (LoopingSound)LoopingSound->Stop();
-		bHit=true;
-	}
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return;
+	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (SourceAvatarActor == OtherActor) return;
+	if (!UAuraAbilitySystemLibrary::IsNotFriends(SourceAvatarActor, OtherActor)) return;
+	if (!bHit) OnHit();
 
 	if (HasAuthority())
 	{
-		Destroy();
+		
 		if (UAbilitySystemComponent* TargetASC=UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageSpecHandle.Data.Get());
+			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			DamageEffectParams.DeathImpulse = DeathImpulse;
+			const bool bKnockback = FMath::RandRange(1, 100) < DamageEffectParams.KnockbackChance;
+			if (bKnockback)
+			{
+				FRotator Rotation = GetActorRotation();
+				Rotation.Pitch = 45.f;
+				
+				const FVector KnockbackDirection = Rotation.Vector();
+				const FVector KnockbackForce = KnockbackDirection * DamageEffectParams.KnockbackForceMagnitude;
+				DamageEffectParams.KnockbackForce = KnockbackForce;
+			}
+			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
+			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
+		Destroy();
 	}
 	else
 	{
