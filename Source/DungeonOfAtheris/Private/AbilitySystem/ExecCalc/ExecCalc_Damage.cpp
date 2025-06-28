@@ -8,6 +8,7 @@
 #include "BaseGameplayTags.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 struct AuraDamageStatics
 {
@@ -137,6 +138,7 @@ FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 	}
 
 	const FGameplayEffectSpec& EffectSpec=ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle EffectContextHandle=EffectSpec.GetContext();
 
 	const FGameplayTagContainer* SourceTags=EffectSpec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags=EffectSpec.CapturedTargetTags.GetAggregatedTags();
@@ -158,11 +160,37 @@ FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 		const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[ResistanceTypeTag];
 		
 		float DamageTypeValue=EffectSpec.GetSetByCallerMagnitude(DamageTypeTag);
+		if (DamageTypeValue <= 0.f)
+		{
+			continue;
+		}
 		float ResistanceValue=0.f;
 
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef,EvaluatedParams,ResistanceValue);
 		ResistanceValue=FMath::Clamp(ResistanceValue,0.f,100.f);
 		DamageTypeValue=DamageTypeValue*(100.f-ResistanceValue)/100.f;
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
+			{
+				CombatInterface->GetOnDamageSignature().AddLambda([&](float DamageAmount)
+				{
+					DamageTypeValue = DamageAmount;
+				});
+			}
+			UGameplayStatics::ApplyRadialDamageWithFalloff(
+				TargetAvatar,
+				DamageTypeValue,
+				0.f,
+				UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f,
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				SourceAvatar,
+				nullptr);
+		}
 		Damage+=DamageTypeValue;
 	}
     float TargetBlockChance=0.f;
@@ -192,8 +220,7 @@ FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 	//if block, cut to damage half
 	const bool bBlocked=FMath::RandRange(0.f,100.f)<TargetBlockChance;
 	Damage=bBlocked ? Damage/2.f : Damage;
-
-	FGameplayEffectContextHandle EffectContextHandle=EffectSpec.GetContext();
+	
 	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle,bBlocked);
 
 	UCharacterClassInfo* ClassInfo=UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);

@@ -26,7 +26,7 @@ public:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "FireBlast")
-	int32 NumFireBalls = 12;
+	int32 NumFireBalls = 6;
 
 private:
 

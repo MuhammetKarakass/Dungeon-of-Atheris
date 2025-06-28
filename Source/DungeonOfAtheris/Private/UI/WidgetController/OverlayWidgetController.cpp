@@ -21,9 +21,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	GetAuraPS()->OnXPChangedDelegate.AddUObject(this,&UOverlayWidgetController::OnXPChanged);
 	GetAuraPS()->OnLevelCanChangeDelegate.AddLambda(
-		[this](int32 NewLevel)
+		[this](int32 NewLevel, bool bLevelUp)
 		{
-			OnPlayerLevelChangeDelegate.Broadcast(NewLevel);
+			OnPlayerLevelChangeDelegate.Broadcast(NewLevel,bLevelUp);
 		});
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate

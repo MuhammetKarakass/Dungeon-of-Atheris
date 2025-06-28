@@ -10,6 +10,8 @@
  * 
  */
 
+class ULoadScreenSaveGame;
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer&)
 DECLARE_MULTICAST_DELEGATE(FAbilitiesGiven)
 DECLARE_DELEGATE_OneParam(FForEachAbility,const FGameplayAbilitySpec&)
@@ -43,6 +45,7 @@ public:
 
 	bool bStartupAbilitiesGiven=false;
 
+	void AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveData);
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);

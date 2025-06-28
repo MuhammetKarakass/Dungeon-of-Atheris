@@ -12,6 +12,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged,int32)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLevelChanged, int32 , bool)
 
 UCLASS()
 class DUNGEONOFATHERIS_API AAuraPlayerState : public APlayerState,public IAbilitySystemInterface
@@ -40,9 +41,10 @@ public:
 	void SetLevel(int32 InLevel);
 	void SetAttributePoints(int32 InAttributePoints);
 	void SetSpellPoints(int32 InSpellPoints);
+	
 
 	FOnPlayerStatChanged OnXPChangedDelegate;
-	FOnPlayerStatChanged OnLevelCanChangeDelegate;
+	FOnLevelChanged OnLevelCanChangeDelegate;
 	FOnPlayerStatChanged OnAttributePointsCanChangeDelegate;
 	FOnPlayerStatChanged OnSpellPointsCanChangeDelegate;
 

@@ -131,6 +131,13 @@ void ABaseCharacter::InitAbilityActorInfo()
 {
 }
 
+float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float DamageTaken = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	OnDamageDelegate.Broadcast(DamageTaken);
+	return DamageTaken;
+}
+
 FVector ABaseCharacter::GetSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	for (auto Pair: TagToSocket)
@@ -214,6 +221,11 @@ void ABaseCharacter::SetIsBeingShocked_Implementation(bool bInShock)
 bool ABaseCharacter::IsBeingShocked_Implementation() const
 {
 	return bIsBeingShocked;
+}
+
+FOnDamageSignature& ABaseCharacter::GetOnDamageSignature()
+{
+	return OnDamageDelegate;
 }
 
 

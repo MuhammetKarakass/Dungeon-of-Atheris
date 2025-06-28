@@ -13,6 +13,7 @@ struct FGameplayTag;
 struct FOnAttributeChangeData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangeSignature,float,NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLevelChangedSignature, int32, NewLevel, bool, bLevelUp);
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow:public FTableRowBase
@@ -62,7 +63,7 @@ public:
 	FOnAttributeChangeSignature OnPercentChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable,Category="GAS|XP")
-	FOnPlayerStatChangeSignature OnPlayerLevelChangeDelegate;
+	FOnLevelChangedSignature OnPlayerLevelChangeDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Widget Data")

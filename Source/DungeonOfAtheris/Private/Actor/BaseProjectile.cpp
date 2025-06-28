@@ -36,6 +36,16 @@ ABaseProjectile::ABaseProjectile()
 }
 
 
+bool ABaseProjectile::IsValidOverlap(AActor* OtherActor)
+{
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return false;
+	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (SourceAvatarActor == OtherActor) return false;
+	if (!UAuraAbilitySystemLibrary::IsNotFriends(SourceAvatarActor, OtherActor)) return false;
+
+	return true;
+}
+
 void ABaseProjectile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -74,10 +84,7 @@ void ABaseProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	// AActor* Acctor=DamageSpecHandle.Data.Get()->GetContext().GetEffectCauser();
 	// if (Acctor==OtherActor && DamageSpecHandle.Data.IsValid()) return;
-	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return;
-	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	if (SourceAvatarActor == OtherActor) return;
-	if (!UAuraAbilitySystemLibrary::IsNotFriends(SourceAvatarActor, OtherActor)) return;
+	if (!IsValidOverlap(OtherActor)) return;
 	if (!bHit) OnHit();
 
 	if (HasAuthority())

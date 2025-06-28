@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<USceneComponent> HomingTargetSceneComponent;
+	
+	bool IsValidOverlap(AActor* OtherActor);
+	bool bHit=false;
 protected:
 
 	virtual void BeginPlay() override;
@@ -55,5 +58,5 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> LoopingSound;
-	bool bHit=false;
+
 };

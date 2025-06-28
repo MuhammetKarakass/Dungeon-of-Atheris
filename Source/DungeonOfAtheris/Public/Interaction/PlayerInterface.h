@@ -55,4 +55,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetSpellPoints();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SaveProgress(const FName& CheckpointTag);
 };
