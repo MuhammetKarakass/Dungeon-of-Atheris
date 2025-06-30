@@ -21,9 +21,7 @@ class DUNGEONOFATHERIS_API IEnemyInterface
 	GENERATED_BODY()
 
 public:
-
-	virtual void HiglightActor()=0;
-	virtual void UnHiglightActor()=0;
+	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetCombatTarget(AActor* InCombatTarget);

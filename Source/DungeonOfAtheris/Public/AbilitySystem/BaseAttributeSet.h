@@ -245,7 +245,9 @@ private:
 
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	void SendXPEvent(const FEffectProperties& Props);
-	void Debuff(const FEffectProperties& Props);
+	static void Debuff(const FEffectProperties& Props);
+	static void Siphon(const FString& Attribute, float Damage, const FEffectProperties& Props);
+	
 	void HandleIncomingDamage(const FEffectProperties& Props);
 	void HandleIncomingXP(const FEffectProperties& Props);
 

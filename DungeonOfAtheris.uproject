@@ -40,5 +40,10 @@
 			"Name": "ModelViewViewModel",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Linux",
+		"Windows",
+		"Mac"
 	]
 }

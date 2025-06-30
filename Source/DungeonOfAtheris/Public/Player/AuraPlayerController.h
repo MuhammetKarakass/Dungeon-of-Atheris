@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GameplayTagContainer.h"
+#include "Interaction/HighlightInterface.h"
 #include "AuraPlayerController.generated.h"
 
 class UNiagaraSystem;
@@ -16,6 +17,13 @@ class UInputAction;
 class IEnemyInterface;
 class UAuraInputConfig;
 struct FInputActionValue;
+
+enum class ETargetingStatus : uint8
+{
+	TargetingEnemy,
+	TargetingNonEnemy,
+	NotTargeting
+};
 
 UCLASS()
 class DUNGEONOFATHERIS_API AAuraPlayerController : public APlayerController
@@ -42,6 +50,9 @@ private:
 	void CursorTrace();
 	void AutoRun();
 
+	static void HighlightActor(AActor* InActor);
+	static void UnHighlightActor(AActor* InActor);
+	
 	void AbilityInputTagPressed(FGameplayTag Tag);
 	void AbilityInputTagReleased(FGameplayTag Tag);
 	void AbilityInputTagHeld(FGameplayTag Tag);
@@ -51,8 +62,8 @@ private:
 	void ShiftKeyReleased(){bShiftKeyDown=false;}
 	UBaseAbilitySystemComponent* GetASC();
 
-	TScriptInterface<IEnemyInterface> CurrentActor;
-	TScriptInterface<IEnemyInterface> LastActor;
+	TObjectPtr<AActor> LastActor;
+	TObjectPtr<AActor> CurrentActor;
 	
 	UPROPERTY(EditAnywhere,Category = Input)
 	TObjectPtr<UInputMappingContext> AuraContext;
@@ -77,7 +88,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float ShorPressedTime=0.5f;
 	bool bAutoRunning=false;
-	bool bTargeting=false;
+	ETargetingStatus TargetingStatus = ETargetingStatus::NotTargeting;
 
 	UPROPERTY(EditAnywhere)
 	float AutoRunAcceptanceRadius=50.f;
@@ -86,4 +97,5 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+	
 };

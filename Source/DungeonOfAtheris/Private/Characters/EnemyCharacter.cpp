@@ -25,6 +25,11 @@ AEnemyCharacter::AEnemyCharacter()
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
 
+	GetMesh()->SetCustomDepthStencilValue(250);
+	GetMesh()->MarkRenderStateDirty();
+	Weapon->SetCustomDepthStencilValue(250);
+	Weapon->MarkRenderStateDirty();
+
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -113,15 +118,13 @@ void AEnemyCharacter::InitDefaultAttributes() const
 	UAuraAbilitySystemLibrary::InitializeDefaultAttributes(this,CharacterClass,Level,AbilitySystemComponent);
 }
 
-void AEnemyCharacter::HiglightActor()
+void AEnemyCharacter::HiglightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(true);
-	GetMesh()->SetCustomDepthStencilValue(250);
 	Weapon->SetRenderCustomDepth(true);
-	Weapon->SetCustomDepthStencilValue(250);
 }
 
-void AEnemyCharacter::UnHiglightActor()
+void AEnemyCharacter::UnHiglightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
@@ -131,7 +134,13 @@ void AEnemyCharacter::Die(const FVector& DeathImpulse)
 {
 	SetLifeSpan(LifeSpan);
 	if (AIController) AIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"),true);
+	SpawnLoot();
 	Super::Die(DeathImpulse);
+}
+
+void AEnemyCharacter::SetMoveToLocation_Implementation(FVector& OutDestination)
+{
+	
 }
 
 int32 AEnemyCharacter::GetLevel_Implementation()

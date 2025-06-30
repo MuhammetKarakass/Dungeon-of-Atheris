@@ -45,7 +45,13 @@ public:
 	virtual int32 GetAttributePoints_Implementation() override;
 	virtual int32 GetSpellPoints_Implementation() override;
 	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	//end Player Interface
+
+	UPROPERTY(EditDefaultsOnly)
+	float DeathTime = 5.f;
+
+	FTimerHandle DeathTimer;
 
 	virtual void OnRep_Stunned() override;
 	virtual void OnRep_Burned() override;

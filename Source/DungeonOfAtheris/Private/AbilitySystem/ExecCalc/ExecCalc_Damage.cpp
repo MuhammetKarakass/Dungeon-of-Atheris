@@ -101,6 +101,27 @@ void UExecCalc_Damage::DetermineDebuff(const FGameplayEffectCustomExecutionParam
 	}
 }
 
+float UExecCalc_Damage::ApplyDamageReductionByHaloOfProtection(float Damage, const int32 TargetLevel,
+															   const UAbilitySystemComponent* TargetASC,
+															   const UCharacterClassInfo* TargetCharacterClassInfo) const
+{
+	const FBaseGameplayTags& AbilityTags = FBaseGameplayTags::Get();
+	if (!TargetASC || !TargetASC->HasMatchingGameplayTag(AbilityTags.Abilities_Passive_HaloOfProtection) ||
+		!TargetCharacterClassInfo || !TargetCharacterClassInfo->DamageCalculationCoefficient)
+	{
+		return Damage;
+	}
+
+	const FRealCurve* DamageReductionCurve = TargetCharacterClassInfo->DamageCalculationCoefficient->FindCurve(
+		FName("HaloOfProtection"), FString());
+
+	if (DamageReductionCurve)
+	{
+		const float DamageReductionPercent = DamageReductionCurve->Eval(TargetLevel);
+		Damage *= 1.f - DamageReductionPercent / 100.f;
+	}
+	return Damage;
+}
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
@@ -243,6 +264,8 @@ FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 	const bool bCriticalHit=FMath::RandRange(0.f,100.f)<EffectiveCriticalHitChance;
 	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle,bCriticalHit);
 	Damage=bCriticalHit ? Damage*2.f+SourceCriticalHitDamage : Damage;
+
+	Damage = ApplyDamageReductionByHaloOfProtection(Damage, TargetPlayerLevel, TargetASC, ClassInfo);
 	
 	const FGameplayModifierEvaluatedData EvaluatedData(UBaseAttributeSet::GetIncomingDamageAttribute(),EGameplayModOp::Additive,Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);

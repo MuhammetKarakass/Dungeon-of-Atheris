@@ -9,11 +9,11 @@
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Input/AuraInputComponent.h"
-#include "Input/AuraInputConfig.h"
-#include "Interaction/EnemyInterface.h"
+#include "Interaction/HighlightInterface.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/EnemyInterface.h"
 #include "UI/UserWidget/DamageTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -39,6 +39,22 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmmount,
 		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
 		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		DamageTextComponent->SetDamageText(DamageAmmount,bIsBlockedHit,bIsCriticalHit);
+	}
+}
+
+void AAuraPlayerController::HighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_HiglightActor(InActor);
+	}
+}
+
+void AAuraPlayerController::UnHighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_UnHiglightActor(InActor);
 	}
 }
 
@@ -69,8 +85,16 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag Tag)
 	
 	if (Tag.MatchesTagExact(FBaseGameplayTags::Get().InputTag_LMB))
 	{
-		bTargeting=CurrentActor ? true : false;
-		bAutoRunning=false;
+		if (IsValid(CurrentActor))
+		{
+			TargetingStatus = CurrentActor->Implements<UEnemyInterface>() ? ETargetingStatus::TargetingEnemy : ETargetingStatus::TargetingNonEnemy;
+			bAutoRunning = false;
+		}
+		else
+		{
+			TargetingStatus = ETargetingStatus::NotTargeting;
+		}
+		bAutoRunning = false;
 	}
 	if (GetASC()) GetASC()->AbilityInputTagPressed(Tag);
 }
@@ -96,29 +120,35 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag Tag)
 		GetASC()->AbilityInputTagReleased(Tag);
 	}
 	
-	if (!bTargeting&&!bShiftKeyDown)
+	if (TargetingStatus != ETargetingStatus::TargetingEnemy && !bShiftKeyDown)
 	{
-		APawn* ControllerPawn = GetPawn();
-		if (UNavigationPath* NavPath=UNavigationSystemV1::FindPathToLocationSynchronously(this,ControllerPawn->GetActorLocation(),CachedDestination))
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShorPressedTime && ControlledPawn)
 		{
-			Spline->ClearSplinePoints();
-			for (const FVector& PointLoc:NavPath->PathPoints)
+			if (IsValid(CurrentActor) && CurrentActor->Implements<UHighlightInterface>())
 			{
-				Spline->AddSplinePoint(PointLoc,ESplineCoordinateSpace::World);
+				IHighlightInterface::Execute_SetMoveToLocation(CurrentActor, CachedDestination);
 			}
-			
-			if (NavPath->PathPoints.Num()>0)
-			{
-				CachedDestination=NavPath->PathPoints[NavPath->PathPoints.Num()-1];
-				bAutoRunning=true;
-			}
-			if (GetASC() && !GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
+			else if (GetASC() && !GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
 			{
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 			}
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				Spline->ClearSplinePoints();
+				for (const FVector& PointLoc : NavPath->PathPoints)
+				{
+					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+				}
+				if (NavPath->PathPoints.Num() > 0)
+				{
+					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+					bAutoRunning = true;
+				}
+			}
 		}
-		bTargeting=false;
-		FollowTime=0.f;
+		FollowTime = 0.f;
+		TargetingStatus = ETargetingStatus::NotTargeting;
 	}
 }
 
@@ -132,7 +162,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag Tag)
 		}
 		return;
 	}
-	if (bTargeting||bShiftKeyDown)
+	if (TargetingStatus == ETargetingStatus::TargetingEnemy ||bShiftKeyDown)
 	{
 		if (GetASC())
 		{
@@ -170,8 +200,9 @@ void AAuraPlayerController::CursorTrace()
 
 	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_CursorTrace))
 	{
-		if (LastActor) LastActor->UnHiglightActor();
-		if (CurrentActor) CurrentActor->UnHiglightActor();
+		UnHighlightActor(LastActor);
+		UnHighlightActor(CurrentActor);
+		if (IsValid(CurrentActor) && CurrentActor->Implements<UHighlightInterface>())
 		LastActor = nullptr;
 		CurrentActor = nullptr;
 		return;
@@ -180,48 +211,20 @@ void AAuraPlayerController::CursorTrace()
 	GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	LastActor=CurrentActor;
 	CurrentActor=HitResult.GetActor();
-    /**
-	* Line trace from cursor. There are several scenarios:
-	* A. LastActor is null && ThisActor is null
-	*- Do nothing
-	*B. LastActor is null && ThisActor is valid
-	*- Highlight ThisActor
-	* C. LastActor is valid && ThisActor is null
-	*- UnHighlight LastActor
-	*D. Both actors are valid, but LastActor != ThisActor
-	*- UnHighlight LastActor, and Highlight ThisActor
-	*E. Both actors are valid, and are the same actor
-	*- Do nothing
-	*/
-	if (LastActor==nullptr)
-	{
-		if (CurrentActor!=nullptr)
-		{
-			CurrentActor->HiglightActor();
-		}
-		else
-		{
-			//do nothing
-		}
+	if (!HitResult.bBlockingHit) return;
+	//LastActor=CurrentActor;
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->Implements<UHighlightInterface>()){
+		
+		CurrentActor = HitResult.GetActor();
 	}
 	else
 	{
-		if (CurrentActor==nullptr)
-		{
-			LastActor->UnHiglightActor();
-		}
-		else
-		{
-			if (CurrentActor!=LastActor)
-			{
-				LastActor->UnHiglightActor();
-				CurrentActor->HiglightActor();
-			}
-			else
-			{
-				//do nothing
-			}
-		}
+		CurrentActor = nullptr;
+	}
+	if (LastActor != CurrentActor)
+	{
+		UnHighlightActor(LastActor);
+		HighlightActor(CurrentActor);
 	}
 }
 
@@ -280,4 +283,3 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 	}
 	
 }
-

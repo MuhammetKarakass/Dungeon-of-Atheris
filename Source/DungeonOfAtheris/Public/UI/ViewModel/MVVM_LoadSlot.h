@@ -37,6 +37,9 @@ public:
 	UPROPERTY()
 	TEnumAsByte<ESaveSlotStatus> SlotStatus;
 
+	UPROPERTY()
+	FString MapAssetName;
+
 	/** Field Notifies */
 
 	void SetPlayerName(FString InPlayerName);

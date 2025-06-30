@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
 #include "Interaction/EnemyInterface.h"
+#include "Interaction/HighlightInterface.h"
 #include  "UI/WidgetController/OverlayWidgetController.h"
 #include "EnemyCharacter.generated.h"
 
@@ -15,7 +16,7 @@ class UWidgetComponent;
  * 
  */
 UCLASS()
-class DUNGEONOFATHERIS_API AEnemyCharacter : public ABaseCharacter,public IEnemyInterface
+class DUNGEONOFATHERIS_API AEnemyCharacter : public ABaseCharacter,public IEnemyInterface,public IHighlightInterface
 {
 	GENERATED_BODY()
 
@@ -24,9 +25,10 @@ public:
 	AEnemyCharacter();
 
 	// begin Enemy Interface
-	virtual void HiglightActor() override;
-	virtual void UnHiglightActor() override;
+	virtual void HiglightActor_Implementation() override;
+	virtual void UnHiglightActor_Implementation() override;
 	virtual void Die(const FVector& DeathImpulse) override;
+	virtual void SetMoveToLocation_Implementation(FVector& OutDestination) override;
 	// end Enemy Interface
 
 	virtual int32 GetLevel_Implementation() override;
@@ -50,6 +52,8 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
 	float LifeSpan=5.f;
+
+	void SetLevel(int32 InLevel) { Level = InLevel; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -74,6 +78,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<ABaseAIController> AIController;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLoot();
 };
 
 inline void AEnemyCharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)

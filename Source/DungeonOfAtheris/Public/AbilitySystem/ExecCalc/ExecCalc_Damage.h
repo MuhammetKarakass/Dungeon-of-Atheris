@@ -6,6 +6,7 @@
 #include "GameplayEffectExecutionCalculation.h"
 #include "ExecCalc_Damage.generated.h"
 
+class UCharacterClassInfo;
 /**
  * 
  */
@@ -16,6 +17,9 @@ class DUNGEONOFATHERIS_API UExecCalc_Damage : public UGameplayEffectExecutionCal
 
 public:
 	UExecCalc_Damage();
+
+	float ApplyDamageReductionByHaloOfProtection(float Damage, const int32 TargetLevel,
+															   const UAbilitySystemComponent* TargetASC,const UCharacterClassInfo* TargetCharacterClassInfo) const;
 
 	void DetermineDebuff(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 						 const FGameplayEffectSpec& Spec,

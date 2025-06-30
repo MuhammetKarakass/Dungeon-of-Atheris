@@ -77,7 +77,8 @@ protected:
 	//2 veriyi tutuyoruz
 	TMap<FActiveGameplayEffectHandle,UAbilitySystemComponent*> ActiveGameplayEffects;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Applied Effects")
+	float ActorLevel = 1.f;
 	
 	// UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Applied Effect")
 	// TArray<TSubclassOf<UGameplayEffect>> InstantGameplayEffect;
