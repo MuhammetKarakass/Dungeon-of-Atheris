@@ -6,16 +6,10 @@
 
 **Proje Kategorisi:** Bilgisayar oyunu
 
-**Grup Adı:** Atheris
-
 **Proje Ekibi:** Muhammet Ali Karakaş
 
-1. [Gereksinim Analizi](Gereksinimler.md)
-2. [Durum Diyagramı](Durum-Diyagramı.md)
-3. [Durum Senaryoları](Durum-Senaryoları.md)
-4. [Front-End](Front-End.md)
-5. [Back-End](Back-End.md)
-6. [Video Sunum](Sunum.md)
+[Gereksinim Analizi](Gereksinimler.md)
+
 
 **Yapılan Çalışmalara Ait Videolar:** 
 https://youtu.be/fReGhemKiwk
